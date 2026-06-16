@@ -2,6 +2,12 @@
 
 아이디어를 중국 제조 양산 제품으로 연결하는 웹사이트 + 의뢰 접수 백엔드.
 
+## 미리보기
+
+| 데스크톱 | 모바일 |
+|:---:|:---:|
+| <img src="docs/desktop.png" alt="MOLDLINE 데스크톱 화면" width="600" /> | <img src="docs/mobile.png" alt="MOLDLINE 모바일 화면" width="210" /> |
+
 ## 구성
 
 | 파일 | 역할 |
