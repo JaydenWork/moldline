@@ -73,7 +73,12 @@ img { max-width: 100%; display: block; }
   background: rgba(14, 23, 38, 0.85);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255,255,255,0.08);
-  transition: background 0.3s;
+  transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+.nav.is-scrolled {
+  background: rgba(10, 17, 32, 0.95);
+  box-shadow: 0 14px 34px -20px rgba(0, 0, 0, 0.6);
+  border-bottom-color: rgba(255,255,255,0.04);
 }
 .nav__inner { display: flex; align-items: center; gap: 24px; height: 70px; }
 .logo { display: inline-flex; align-items: center; gap: 9px; color: #fff; }
@@ -388,9 +393,23 @@ img { max-width: 100%; display: block; }
   display: none;
 }
 
-/* ===== Reveal animation ===== */
-[data-reveal] { opacity: 0; transform: translateY(24px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
-[data-reveal].is-in { opacity: 1; transform: none; }
+/* ===== 스크롤 인터랙션 (애플 스타일 reveal) ===== */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease), filter 0.8s var(--ease);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+[data-reveal="scale"] { transform: translateY(22px) scale(0.93); }
+[data-reveal="left"]  { transform: translateX(-48px); }
+[data-reveal="right"] { transform: translateX(48px); }
+[data-reveal="blur"]  { transform: translateY(20px); filter: blur(14px); }
+[data-reveal="fade"]  { transform: none; }
+[data-reveal].is-in { opacity: 1; transform: none; filter: none; }
+
+/* 이미지 패럴럭스 — 컨테이너보다 살짝 크게 두고 스크롤에 따라 이동 */
+.has-parallax { transform: scale(1.18); will-change: transform; }
 
 /* ============================================================
    Responsive
@@ -479,5 +498,7 @@ img { max-width: 100%; display: block; }
 
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto; }
-  [data-reveal] { opacity: 1; transform: none; transition: none; }
+  [data-reveal] { opacity: 1; transform: none; filter: none; transition: none; }
+  .has-parallax { transform: none !important; }
+  .hero__inner, .hero__grid { transform: none !important; opacity: 1 !important; }
 }

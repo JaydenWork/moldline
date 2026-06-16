@@ -24,21 +24,130 @@
     });
   }
 
-  /* ---- 스크롤 등장 애니메이션 ---- */
-  var revealTargets = [];
-  document.querySelectorAll(".card, .pcase, .step, .cert, .qc__step, .price-card, .faq__item, .trust__text, .trust__panel")
-    .forEach(function (el) { el.setAttribute("data-reveal", ""); revealTargets.push(el); });
+  /* ============================================================
+     애플 스타일 스크롤 인터랙션
+     - 섹션별 reveal 변형 + 순차 등장(스태거)
+     - 이미지 패럴럭스 · 히어로 스크롤 페이드 · nav 스크롤 상태
+     ============================================================ */
+  var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  if ("IntersectionObserver" in window) {
+  function setReveal(el, variant, delay) {
+    if (!el || el.hasAttribute("data-reveal")) return;
+    el.setAttribute("data-reveal", variant || "up");
+    if (delay) el.style.setProperty("--reveal-delay", delay + "ms");
+  }
+  function groupReveal(containerSel, itemSel, variant, step, cap) {
+    document.querySelectorAll(containerSel).forEach(function (c) {
+      Array.prototype.forEach.call(c.querySelectorAll(itemSel), function (el, i) {
+        setReveal(el, variant, Math.min(i, cap || 6) * (step || 80));
+      });
+    });
+  }
+
+  /* 콘텐츠 그룹 — 순차 등장 */
+  groupReveal(".stats__inner", ".stat", "up", 90);
+  groupReveal(".cards", ".card", "up", 80);
+  groupReveal(".portfolio", ".pcase", "scale", 90);
+  groupReveal(".steps", ".step", "up", 90);
+  groupReveal(".certs", ".cert", "scale", 55);
+  groupReveal(".qc__steps", ".qc__step", "up", 70);
+  groupReveal(".pricing", ".price-card", "up", 110);
+  groupReveal(".faq", ".faq__item", "up", 55);
+
+  /* 신뢰 섹션 — 좌우 분할 슬라이드 */
+  setReveal(document.querySelector(".trust__text"), "left");
+  setReveal(document.querySelector(".trust__panel"), "right");
+
+  /* 미디어 카드 / KC 배너 — 페이드(내부 이미지 패럴럭스와 겹치지 않게 이동 없음) */
+  document.querySelectorAll(".media-card, .kc-banner").forEach(function (el) { setReveal(el, "fade"); });
+
+  /* 푸터 컬럼 */
+  var footerInner = document.querySelector(".footer__inner");
+  if (footerInner) Array.prototype.forEach.call(footerInner.children, function (el, i) { setReveal(el, "up", i * 90); });
+
+  /* 섹션 헤더 — eyebrow → title → lead 캐스케이드 (이미 reveal 내부면 제외) */
+  document.querySelectorAll("section").forEach(function (sec) {
+    if (sec.classList.contains("hero")) return;
+    [".eyebrow", ".section__title", ".section__lead"].forEach(function (sel, i) {
+      var el = sec.querySelector(sel);
+      if (el && !el.closest("[data-reveal]")) setReveal(el, "up", i * 70);
+    });
+  });
+
+  /* 히어로 — 로드 시 순차 등장 */
+  var heroBits = [];
+  document.querySelectorAll(".hero .eyebrow, .hero__title, .hero__sub, .hero__cta, .hero__badges")
+    .forEach(function (el, i) { setReveal(el, "up", i * 90); heroBits.push(el); });
+
+  /* IntersectionObserver — 뷰포트 진입 시 등장 */
+  if (!prefersReduced && "IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
       });
-    }, { threshold: 0.12 });
-    revealTargets.forEach(function (el) { io.observe(el); });
+    }, { threshold: 0.08, rootMargin: "0px 0px -8% 0px" });
+    document.querySelectorAll("[data-reveal]").forEach(function (el) {
+      if (!el.closest(".hero")) io.observe(el);
+    });
   } else {
-    revealTargets.forEach(function (el) { el.classList.add("is-in"); });
+    document.querySelectorAll("[data-reveal]").forEach(function (el) { el.classList.add("is-in"); });
   }
+
+  /* 히어로는 로드 직후 등장 */
+  if (!prefersReduced) {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        heroBits.forEach(function (el) { el.classList.add("is-in"); });
+      });
+    });
+  }
+
+  /* 이미지 패럴럭스 대상 */
+  var parallaxImgs = [];
+  if (!prefersReduced) {
+    document.querySelectorAll(".photo-banner img, .kc-banner img, .media-card img").forEach(function (img) {
+      img.classList.add("has-parallax");
+      parallaxImgs.push(img);
+    });
+  }
+
+  var heroInner = document.querySelector(".hero__inner");
+  var heroGrid = document.querySelector(".hero__grid");
+
+  function onScrollFx() {
+    var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+    if (nav) nav.classList.toggle("is-scrolled", y > 18);
+    if (prefersReduced) return;
+
+    /* 히어로 — 스크롤에 따라 위로 밀리며 페이드 */
+    if (heroInner && y < 800) {
+      heroInner.style.transform = "translate3d(0," + (y * 0.16).toFixed(1) + "px,0)";
+      heroInner.style.opacity = String(Math.max(0, 1 - y / 560));
+    }
+    if (heroGrid && y < 1000) heroGrid.style.transform = "translate3d(0," + (y * 0.28).toFixed(1) + "px,0)";
+
+    /* 이미지 패럴럭스 */
+    var vh = window.innerHeight;
+    parallaxImgs.forEach(function (img) {
+      var host = img.parentElement;
+      var r = host.getBoundingClientRect();
+      if (r.bottom < -80 || r.top > vh + 80) return;
+      var prog = (r.top + r.height / 2 - vh / 2) / vh;
+      var shift = (-prog * 26).toFixed(1);
+      img.style.transform = "translate3d(0," + shift + "px,0) scale(1.18)";
+    });
+  }
+
+  var fxTicking = false;
+  function onScroll() {
+    if (!fxTicking) {
+      window.requestAnimationFrame(function () { onScrollFx(); fxTicking = false; });
+      fxTicking = true;
+    }
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll, { passive: true });
+  onScrollFx();
 
   /* ============================================================
      파일 업로드 (드래그앤드롭 + 미리보기 목록)
