@@ -1,0 +1,11 @@
+node_modules/
+uploads/
+.env
+*.log
+.DS_Store
+
+# 로컬 에이전트/에디터 설정
+.claude/settings.local.json
+
+# pm2 로그
+logs/

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>MOLDLINE 관리자 — 접수 내역</title>
+  <style>
+    :root {
+      --ink:#0e1726; --slate:#5a6678; --line:#e3e7ee; --soft:#f4f6fa;
+      --accent:#ffcf2d; --accent-deep:#f5b800; --green:#18a974;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:"IBM Plex Sans KR",system-ui,"Malgun Gothic",sans-serif; background:var(--soft); color:var(--ink); line-height:1.6; }
+    .topbar { background:var(--ink); color:#fff; padding:16px 24px; display:flex; align-items:center; gap:14px; position:sticky; top:0; z-index:10; }
+    .topbar h1 { font-size:1.1rem; font-weight:800; }
+    .topbar h1 span { color:var(--accent); }
+    .topbar .meta { margin-left:auto; font-size:.88rem; color:rgba(255,255,255,.7); display:flex; gap:14px; align-items:center; }
+    .topbar button { background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.2); border-radius:8px; padding:7px 14px; cursor:pointer; font-size:.85rem; }
+    .topbar button:hover { background:rgba(255,255,255,.2); }
+    .wrap { max-width:1100px; margin:0 auto; padding:24px; }
+
+    /* 로그인 */
+    .login { max-width:380px; margin:12vh auto; background:#fff; border:1px solid var(--line); border-radius:16px; padding:36px 32px; box-shadow:0 18px 50px -24px rgba(14,23,38,.35); }
+    .login h2 { font-size:1.3rem; margin-bottom:6px; }
+    .login h2 span { color:var(--accent-deep); }
+    .login p { color:var(--slate); font-size:.9rem; margin-bottom:22px; }
+    .login label { display:block; font-size:.85rem; font-weight:600; margin:14px 0 6px; }
+    .login input { width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px; font-size:.95rem; font-family:inherit; }
+    .login input:focus { outline:none; border-color:var(--accent-deep); }
+    .login button { width:100%; margin-top:22px; padding:13px; background:var(--accent); color:#1a1400; border:0; border-radius:999px; font-weight:700; font-size:1rem; cursor:pointer; }
+    .login button:hover { background:var(--accent-deep); }
+    .login .err { color:#d33; font-size:.85rem; margin-top:12px; min-height:1em; text-align:center; }
+
+    /* 목록 */
+    .summary { display:flex; gap:14px; margin-bottom:18px; flex-wrap:wrap; }
+    .pill { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 18px; }
+    .pill b { font-size:1.4rem; font-weight:800; }
+    .pill small { display:block; color:var(--slate); font-size:.8rem; }
+    .toolbar { display:flex; gap:10px; margin-bottom:14px; }
+    .toolbar input { flex:1; padding:11px 14px; border:1.5px solid var(--line); border-radius:10px; font-size:.92rem; font-family:inherit; }
+    .toolbar input:focus { outline:none; border-color:var(--accent-deep); }
+
+    .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:0; margin-bottom:14px; overflow:hidden; }
+    .card__head { display:flex; align-items:center; gap:12px; padding:16px 20px; cursor:pointer; }
+    .card__head:hover { background:#fafbfd; }
+    .card__name { font-weight:700; font-size:1.02rem; }
+    .card__sub { color:var(--slate); font-size:.86rem; }
+    .card__tags { margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    .tag { font-size:.76rem; padding:3px 10px; border-radius:999px; background:var(--soft); color:var(--slate); white-space:nowrap; }
+    .tag--file { background:#fff7d6; color:#8a6d00; }
+    .tag--date { background:transparent; color:var(--slate); }
+    .chev { transition:transform .2s; color:var(--slate); }
+    .card.open .chev { transform:rotate(90deg); }
+    .card__body { display:none; padding:0 20px 20px; border-top:1px solid var(--line); }
+    .card.open .card__body { display:block; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px 18px; margin:16px 0; }
+    .grid div { font-size:.9rem; }
+    .grid span { display:block; color:var(--slate); font-size:.76rem; }
+    .grid a { color:var(--accent-deep); }
+    .idea { background:var(--soft); border-radius:10px; padding:14px 16px; white-space:pre-wrap; font-size:.92rem; }
+    .files { margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+    .file { display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:10px; padding:9px 14px; font-size:.9rem; }
+    .file__size { color:var(--slate); font-size:.8rem; margin-left:auto; }
+    .file button { background:var(--ink); color:#fff; border:0; border-radius:8px; padding:6px 12px; font-size:.82rem; cursor:pointer; }
+    .file button:hover { background:#1f2d48; }
+    .empty { text-align:center; color:var(--slate); padding:60px 20px; }
+    .loading { text-align:center; color:var(--slate); padding:40px; }
+  </style>
+</head>
+<body>
+  <!-- 로그인 화면 -->
+  <div id="loginView">
+    <form class="login" id="loginForm">
+      <h2>MOLD<span>LINE</span> 관리자</h2>
+      <p>접수 내역을 확인하려면 로그인하세요.</p>
+      <label for="u">아이디</label>
+      <input id="u" type="text" autocomplete="username" value="admin" />
+      <label for="p">비밀번호</label>
+      <input id="p" type="password" autocomplete="current-password" />
+      <button type="submit">로그인</button>
+      <div class="err" id="loginErr"></div>
+    </form>
+  </div>
+
+  <!-- 관리자 화면 -->
+  <div id="appView" style="display:none">
+    <div class="topbar">
+      <h1>MOLD<span>LINE</span> · 접수 관리</h1>
+      <div class="meta">
+        <span id="who"></span>
+        <button id="refreshBtn">새로고침</button>
+        <button id="logoutBtn">로그아웃</button>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="summary">
+        <div class="pill"><b id="cntTotal">0</b><small>총 접수</small></div>
+        <div class="pill"><b id="cntFiles">0</b><small>첨부 보유</small></div>
+        <div class="pill"><b id="cntToday">0</b><small>오늘 접수</small></div>
+      </div>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="이름·이메일·연락처·내용 검색…" />
+      </div>
+      <div id="list"><div class="loading">불러오는 중…</div></div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+    var KEY = "moldline_admin_auth";
+    var loginView = document.getElementById("loginView");
+    var appView = document.getElementById("appView");
+    var listEl = document.getElementById("list");
+    var searchEl = document.getElementById("search");
+    var allItems = [];
+
+    function authHeader() { return "Basic " + sessionStorage.getItem(KEY); }
+    function esc(s) { return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+    function fmtSize(b) { return b < 1048576 ? (b/1024).toFixed(1)+" KB" : (b/1048576).toFixed(2)+" MB"; }
+    function fmtDate(s) { if(!s) return "-"; var d=new Date(s); return isNaN(d)?s:d.toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}); }
+
+    /* ---- 로그인 ---- */
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var u = document.getElementById("u").value.trim();
+      var p = document.getElementById("p").value;
+      var token = btoa(unescape(encodeURIComponent(u + ":" + p)));
+      sessionStorage.setItem(KEY, token);
+      document.getElementById("who").textContent = u;
+      load(true);
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+      sessionStorage.removeItem(KEY);
+      appView.style.display = "none";
+      loginView.style.display = "block";
+    });
+    document.getElementById("refreshBtn").addEventListener("click", function () { load(false); });
+    searchEl.addEventListener("input", render);
+
+    /* ---- 데이터 로드 ---- */
+    function load(fromLogin) {
+      fetch("/api/admin/submissions", { headers: { Authorization: authHeader(), Accept: "application/json" } })
+        .then(function (res) {
+          if (res.status === 401) throw new Error("auth");
+          if (res.status === 503) throw new Error("noenv");
+          return res.json();
+        })
+        .then(function (data) {
+          allItems = data.items || [];
+          loginView.style.display = "none";
+          appView.style.display = "block";
+          document.getElementById("loginErr").textContent = "";
+          renderSummary();
+          render();
+        })
+        .catch(function (err) {
+          sessionStorage.removeItem(KEY);
+          appView.style.display = "none";
+          loginView.style.display = "block";
+          var msg = err.message === "noenv"
+            ? "서버에 ADMIN_PASS가 설정되지 않았습니다."
+            : (fromLogin ? "아이디 또는 비밀번호가 올바르지 않습니다." : "");
+          document.getElementById("loginErr").textContent = msg;
+        });
+    }
+
+    function renderSummary() {
+      var today = new Date().toISOString().slice(0,10);
+      document.getElementById("cntTotal").textContent = allItems.length;
+      document.getElementById("cntFiles").textContent = allItems.filter(function(i){return i.files&&i.files.length;}).length;
+      document.getElementById("cntToday").textContent = allItems.filter(function(i){return (i.at||"").slice(0,10)===today;}).length;
+    }
+
+    function render() {
+      var q = searchEl.value.trim().toLowerCase();
+      var items = allItems.filter(function (i) {
+        if (!q) return true;
+        return [i.name,i.email,i.phone,i.idea,i.category].join(" ").toLowerCase().indexOf(q) >= 0;
+      });
+      if (!items.length) { listEl.innerHTML = '<div class="empty">표시할 접수 내역이 없습니다.</div>'; return; }
+
+      listEl.innerHTML = items.map(function (i) {
+        var fileTag = i.files && i.files.length ? '<span class="tag tag--file">첨부 '+i.files.length+'</span>' : '';
+        var files = (i.files||[]).map(function (f) {
+          return '<div class="file"><span>📎 '+esc(f.display)+'</span>'
+               + '<span class="file__size">'+fmtSize(f.size)+'</span>'
+               + '<button data-id="'+esc(i.id)+'" data-file="'+esc(f.stored)+'">다운로드</button></div>';
+        }).join("");
+        return ''
+          + '<div class="card">'
+          +   '<div class="card__head">'
+          +     '<div><div class="card__name">'+esc(i.name||"(이름 없음)")+'</div>'
+          +       '<div class="card__sub">'+esc(i.category||"미분류")+' · '+esc(i.email)+'</div></div>'
+          +     '<div class="card__tags">'
+          +       (i.qty?'<span class="tag">'+esc(i.qty)+'</span>':'')
+          +       fileTag
+          +       '<span class="tag tag--date">'+fmtDate(i.at)+'</span>'
+          +       '<span class="chev">▶</span>'
+          +     '</div>'
+          +   '</div>'
+          +   '<div class="card__body">'
+          +     '<div class="grid">'
+          +       '<div><span>연락처</span><a href="tel:'+esc(i.phone)+'">'+esc(i.phone||"-")+'</a></div>'
+          +       '<div><span>이메일</span><a href="mailto:'+esc(i.email)+'">'+esc(i.email||"-")+'</a></div>'
+          +       '<div><span>예상 예산</span>'+esc(i.budget||"-")+'</div>'
+          +       '<div><span>접수번호</span>'+esc(i.id)+'</div>'
+          +     '</div>'
+          +     '<div class="idea">'+esc(i.idea||"(내용 없음)")+'</div>'
+          +     (files?'<div class="files">'+files+'</div>':'')
+          +   '</div>'
+          + '</div>';
+      }).join("");
+
+      // 펼치기 토글
+      listEl.querySelectorAll(".card__head").forEach(function (h) {
+        h.addEventListener("click", function () { h.parentElement.classList.toggle("open"); });
+      });
+      // 다운로드 (인증 헤더 포함 → blob)
+      listEl.querySelectorAll(".file button").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          download(btn.getAttribute("data-id"), btn.getAttribute("data-file"), btn);
+        });
+      });
+    }
+
+    function download(id, file, btn) {
+      var orig = btn.textContent; btn.textContent = "..."; btn.disabled = true;
+      fetch("/api/admin/download?id=" + encodeURIComponent(id) + "&file=" + encodeURIComponent(file),
+            { headers: { Authorization: authHeader() } })
+        .then(function (res) { if (!res.ok) throw new Error(); return res.blob().then(function(b){return {b:b,res:res};}); })
+        .then(function (o) {
+          var name = file.split("__").slice(1).join("__") || file;
+          var cd = o.res.headers.get("Content-Disposition") || "";
+          var url = URL.createObjectURL(o.b);
+          var a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click();
+          a.remove(); URL.revokeObjectURL(url);
+        })
+        .catch(function () { alert("다운로드 실패"); })
+        .then(function () { btn.textContent = orig; btn.disabled = false; });
+    }
+
+    /* ---- 세션 복원 ---- */
+    if (sessionStorage.getItem(KEY)) load(false);
+  })();
+  </script>
+</body>
+</html>
