@@ -28,6 +28,11 @@ npm run dev   # 자동 재시작 (Node 18+)
 - **파일명**: `originalname`을 `Buffer.from(name,"latin1").toString("utf8")`로 복원. 저장명 `<hex>__<safeName>`, 표시명은 `__` 뒤.
 - **경로 이탈 방지**: `/api/admin/download`의 id 화이트리스트 + `path.relative` 가드 유지.
 
+## 자산
+
+- `assets/img/`: 사진은 전부 Unsplash 무료 라이선스 스톡 이미지(실제 협력사/자사 사진 아님 — 캡션에 "예시 이미지" 명시). 실제 공장·제작사례 사진이 확보되면 같은 파일명으로 교체하면 됨.
+- `assets/img/favicon.svg`: 임시 SVG 파비콘(로고 마크 기반). 정식 브랜드 자산 생기면 교체.
+
 ## 설정 & 배포
 
 - 환경변수는 `.env`(키 목록은 `.env.example`).

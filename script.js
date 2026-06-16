@@ -26,7 +26,7 @@
 
   /* ---- 스크롤 등장 애니메이션 ---- */
   var revealTargets = [];
-  document.querySelectorAll(".card, .step, .cert, .qc__step, .price-card, .faq__item, .trust__text, .trust__panel")
+  document.querySelectorAll(".card, .pcase, .step, .cert, .qc__step, .price-card, .faq__item, .trust__text, .trust__panel")
     .forEach(function (el) { el.setAttribute("data-reveal", ""); revealTargets.push(el); });
 
   if ("IntersectionObserver" in window) {

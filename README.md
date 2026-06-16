@@ -35,7 +35,7 @@ npm start                   # 서버 실행
 ```bash
 npm install                 # 의존성 설치 (최초 1회)
 cp .env.example .env        # 설정 파일 생성
-npm start                   # 서버 실행in
+npm start                   # 서버 실행
 ```
 
 → 브라우저에서 **http://localhost:3000** 접속 (관리자 페이지: **/admin**)

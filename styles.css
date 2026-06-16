@@ -141,7 +141,7 @@ img { max-width: 100%; display: block; }
 .section--form { background:
     radial-gradient(800px 400px at 100% 0%, rgba(255,207,45,0.07), transparent 60%),
     var(--ink); color: #fff; }
-.section__title { font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 800; text-align: center; line-height: 1.18; }
+.section__title { font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 800; text-align: center; line-height: 1.18; word-break: keep-all; }
 .section__title--left { text-align: left; }
 .section__lead { text-align: center; color: var(--slate); max-width: 620px; margin: 16px auto 0; font-size: 1.04rem; }
 .section--dark .section__lead, .section--form .section__lead { color: rgba(255,255,255,0.72); }
@@ -161,6 +161,27 @@ img { max-width: 100%; display: block; }
 }
 .card h3 { font-size: 1.18rem; font-weight: 700; margin-bottom: 10px; }
 .card p { color: var(--slate); font-size: 0.96rem; }
+
+/* ===== Portfolio (제작 가능 품목) ===== */
+.portfolio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 54px; }
+.pcase {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  overflow: hidden; transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s;
+}
+.pcase:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: transparent; }
+.pcase__media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--soft); }
+.pcase__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s var(--ease); }
+.pcase:hover .pcase__media img { transform: scale(1.05); }
+.pcase__tag {
+  position: absolute; top: 12px; left: 12px; z-index: 1;
+  font-family: "Archivo", sans-serif; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.04em;
+  background: rgba(14,23,38,0.86); color: var(--accent); padding: 5px 11px; border-radius: 999px;
+}
+.pcase__body { padding: 20px 22px 24px; }
+.pcase__body h3 { font-size: 1.08rem; font-weight: 700; margin-bottom: 8px; }
+.pcase__body p { color: var(--slate); font-size: 0.9rem; line-height: 1.55; }
+.pcase__meta { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.pcase__chip { font-size: 0.78rem; background: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; color: var(--ink); }
 
 /* ===== Steps ===== */
 .steps { list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 56px; counter-reset: step; }
@@ -208,6 +229,31 @@ img { max-width: 100%; display: block; }
 .cert__name { font-family:"Archivo",sans-serif; font-weight:800; font-size:1.02rem; }
 .cert__desc { color:var(--slate); font-size:.83rem; margin-top:3px; }
 
+/* ===== KC 인증 (전자제품) ===== */
+.kc-hl { color: var(--accent-deep); }
+.kc-banner { position: relative; margin-top: 50px; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); }
+.kc-banner img { width: 100%; height: 300px; object-fit: cover; display: block; filter: brightness(0.42); }
+.kc-banner__overlay {
+  position: absolute; inset: 0; display: flex; align-items: center; gap: 26px;
+  padding: 0 clamp(24px, 5vw, 56px); color: #fff;
+  background: linear-gradient(90deg, rgba(14,23,38,0.82) 0%, rgba(14,23,38,0.35) 100%);
+}
+.kc-banner__badge {
+  flex: none; width: 96px; height: 96px; border-radius: 20px;
+  display: grid; place-items: center;
+  font-family: "Archivo", sans-serif; font-weight: 900; font-size: 2.4rem;
+  color: var(--accent-ink); background: var(--accent); box-shadow: 0 12px 30px -10px var(--accent-deep);
+}
+.kc-banner__text h3 { font-size: clamp(1.2rem, 2.6vw, 1.6rem); font-weight: 800; }
+.kc-banner__text p { margin-top: 8px; color: rgba(255,255,255,0.85); font-size: 0.96rem; max-width: 560px; }
+.kc-cards { margin-top: 22px; }
+.kc-cards .card { display: flex; flex-direction: column; }
+.kc-tag {
+  align-self: flex-start; margin-top: 14px;
+  font-family: "Archivo", sans-serif; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em;
+  color: var(--accent-ink); background: var(--accent); padding: 5px 12px; border-radius: 999px;
+}
+
 /* ===== QC ===== */
 .qc { margin-top:48px; background:linear-gradient(160deg,var(--ink),var(--ink-2)); color:#fff; border-radius:var(--radius-lg); padding:38px 34px; box-shadow:var(--shadow); }
 .qc__head { text-align:center; margin-bottom:28px; }
@@ -222,6 +268,21 @@ img { max-width: 100%; display: block; }
 .qc__docs { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:26px; padding-top:24px; border-top:1px solid rgba(255,255,255,.12); }
 .qc__docs-label { font-size:.85rem; color:rgba(255,255,255,.6); font-weight:600; margin-right:4px; }
 .qc__chip { font-size:.86rem; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); border-radius:999px; padding:7px 15px; }
+
+/* ===== Media card (섹션 내 보조 이미지) ===== */
+.media-card { border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 44px; }
+.media-card img { width: 100%; height: 320px; object-fit: cover; display: block; }
+.media-card figcaption { padding: 14px 22px; background: var(--soft); color: var(--slate); font-size: 0.85rem; }
+
+/* ===== Photo banner (섹션 사이 풀블리드 비주얼) ===== */
+.photo-banner { position: relative; height: 320px; overflow: hidden; }
+.photo-banner img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.5); }
+.photo-banner__caption {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; color: #fff; padding: 0 24px;
+}
+.photo-banner__caption h3 { font-family: "Archivo", sans-serif; font-size: clamp(1.3rem, 3vw, 2rem); font-weight: 800; }
+.photo-banner__caption p { margin-top: 10px; color: rgba(255,255,255,0.82); font-size: 0.95rem; max-width: 560px; }
 
 /* ===== Trust ===== */
 .trust__inner { display: grid; grid-template-columns: 1.2fr 0.9fr; gap: 48px; align-items: center; }
@@ -306,6 +367,8 @@ img { max-width: 100%; display: block; }
 .footer__links { display: flex; flex-direction: column; gap: 10px; }
 .footer__links a:hover { color: var(--accent); }
 .footer__contact a { color: var(--accent); }
+.footer__badges { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.footer__badges li { font-size: 0.8rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; padding: 5px 12px; }
 .footer__copy { margin-top: 14px; font-size: 0.82rem; color: rgba(255,255,255,0.45); }
 
 /* ===== Floating CTA (mobile) ===== */
@@ -325,6 +388,7 @@ img { max-width: 100%; display: block; }
    ============================================================ */
 @media (max-width: 980px) {
   .cards { grid-template-columns: repeat(2, 1fr); }
+  .portfolio { grid-template-columns: repeat(2, 1fr); }
   .steps { grid-template-columns: repeat(2, 1fr); }
   .certs { grid-template-columns: repeat(3, 1fr); }
   .qc__steps { grid-template-columns: repeat(2, 1fr); }
@@ -350,6 +414,7 @@ img { max-width: 100%; display: block; }
 
   .section { padding: 68px 0; }
   .cards { grid-template-columns: 1fr; }
+  .portfolio { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr; }
   .certs { grid-template-columns: repeat(2, 1fr); }
   .qc { padding: 28px 20px; }
@@ -359,6 +424,13 @@ img { max-width: 100%; display: block; }
   .form__row { grid-template-columns: 1fr; gap: 0; }
   .footer__inner { grid-template-columns: 1fr; }
   .floating-cta { display: inline-block; }
+
+  .media-card img { height: 200px; }
+  .photo-banner { height: 220px; }
+
+  .kc-banner img { height: 360px; }
+  .kc-banner__overlay { flex-direction: column; align-items: flex-start; justify-content: center; gap: 16px; padding: 28px 24px; }
+  .kc-banner__badge { width: 72px; height: 72px; font-size: 1.8rem; border-radius: 16px; }
 }
 
 @media (max-width: 420px) {
