@@ -20,6 +20,8 @@ const PORT = process.env.PORT || 3000;
 /* ---- 업로드 설정 ---- */
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 개당 50MB
+// 의뢰 1건의 첨부 총합 한도 — nginx client_max_body_size와 맞출 것(deploy/nginx.conf)
+const MAX_TOTAL_SIZE = (Number(process.env.MAX_TOTAL_SIZE_MB) || 60) * 1024 * 1024;
 // 이메일 첨부 총량 한도 — 이보다 큰 파일은 첨부 대신 서버 경로만 안내
 const EMAIL_ATTACH_LIMIT = (Number(process.env.EMAIL_ATTACH_LIMIT_MB) || 20) * 1024 * 1024;
 
@@ -351,6 +353,16 @@ app.post("/api/submit", function (req, res) {
       if (err.code === "LIMIT_FILE_SIZE") msg = "파일이 50MB를 초과합니다.";
       if (err.code === "LIMIT_FILE_COUNT") msg = "파일은 최대 " + MAX_FILES + "개까지 가능합니다.";
       return res.status(400).json({ ok: false, error: msg });
+    }
+
+    // 첨부 총합 한도 체크 (개별 파일은 multer가 이미 통과시킨 상태)
+    const totalSize = (req.files || []).reduce(function (sum, f) { return sum + f.size; }, 0);
+    if (totalSize > MAX_TOTAL_SIZE) {
+      if (req._uploadDir) fs.rm(req._uploadDir, { recursive: true, force: true }, function () {});
+      return res.status(400).json({
+        ok: false,
+        error: "첨부 파일 총합이 " + (MAX_TOTAL_SIZE / 1048576).toFixed(0) + "MB를 초과합니다."
+      });
     }
 
     const b = req.body || {};

@@ -35,7 +35,7 @@ npm start                   # 서버 실행
 ```bash
 npm install                 # 의존성 설치 (최초 1회)
 cp .env.example .env        # 설정 파일 생성
-npm start                   # 서버 실행
+npm start                   # 서버 실행in
 ```
 
 → 브라우저에서 **http://localhost:3000** 접속 (관리자 페이지: **/admin**)
@@ -102,9 +102,9 @@ npm start                   # 서버 실행
 
 ## 업로드 제한
 
-- 개당 최대 **50MB**, 최대 **10개**
+- 개당 최대 **50MB**, 최대 **10개**, 의뢰 1건당 **총합 60MB**(`MAX_TOTAL_SIZE_MB`)
 - 허용 확장자: 이미지(jpg/png/webp…), pdf/doc/txt, 도면(stp/step/stl/igs/iges/x_t/sldprt/3dm/obj), 압축(zip/rar/7z)
-- 한도는 `server.js` 상단 상수와 `multer fileFilter`에서 조정
+- 한도는 `server.js` 상단 상수와 `multer fileFilter`에서 조정 (nginx 사용 시 `client_max_body_size`도 함께 조정)
 
 ## 배포 메모
 

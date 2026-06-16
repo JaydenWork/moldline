@@ -44,7 +44,8 @@
      파일 업로드 (드래그앤드롭 + 미리보기 목록)
      ============================================================ */
   var MAX_FILES = 10;
-  var MAX_SIZE = 50 * 1024 * 1024; // 50MB
+  var MAX_SIZE = 50 * 1024 * 1024; // 개당 50MB
+  var MAX_TOTAL_SIZE = 60 * 1024 * 1024; // 총합 60MB — server.js MAX_TOTAL_SIZE_MB와 동기화
   var dropzone = document.getElementById("dropzone");
   var fileInput = document.getElementById("files");
   var fileListEl = document.getElementById("filelist");
@@ -87,6 +88,10 @@
     });
   }
 
+  function currentTotalSize() {
+    return selectedFiles.reduce(function (sum, item) { return sum + item.file.size; }, 0);
+  }
+
   function addFiles(list) {
     var arr = Array.prototype.slice.call(list);
     for (var i = 0; i < arr.length; i++) {
@@ -97,6 +102,10 @@
       }
       if (f.size > MAX_SIZE) {
         setNote("'" + f.name + "' 파일이 50MB를 초과합니다.", "err");
+        continue;
+      }
+      if (currentTotalSize() + f.size > MAX_TOTAL_SIZE) {
+        setNote("첨부 파일 총합이 " + (MAX_TOTAL_SIZE / 1048576).toFixed(0) + "MB를 초과합니다.", "err");
         continue;
       }
       selectedFiles.push({ file: f, id: ++uid });

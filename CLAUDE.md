@@ -22,7 +22,7 @@ npm run dev   # 자동 재시작 (Node 18+)
 
 ## 수정 시 함께 맞출 것
 
-- **업로드 제한 3곳 동기화**: `server.js`(상수+multer), `script.js`(클라 검증), nginx `client_max_body_size`(`deploy/nginx.conf`).
+- **업로드 제한 4곳 동기화**: `server.js`(개당 `MAX_FILE_SIZE`+multer, 총합 `MAX_TOTAL_SIZE`/env `MAX_TOTAL_SIZE_MB`), `script.js`(클라 검증, 개당+총합 둘 다), nginx `client_max_body_size`(`deploy/nginx.conf`, 총합보다 약간 여유있게), `.env.example`.
 - **허용 확장자**: `server.js`의 `ALLOWED_EXT`(+multer `fileFilter`)가 기준.
 - **첨부 한도**: `EMAIL_ATTACH_LIMIT_MB`(20)/`DISCORD_ATTACH_LIMIT_MB`(8) 초과 파일은 첨부 대신 서버 경로만 안내(의도된 동작).
 - **파일명**: `originalname`을 `Buffer.from(name,"latin1").toString("utf8")`로 복원. 저장명 `<hex>__<safeName>`, 표시명은 `__` 뒤.
