@@ -11,6 +11,7 @@
 ## 다운로드 & 실행 (처음이라면 여기부터)
 
 > **준비물:** [Node.js LTS](https://nodejs.org) 설치 (18 버전 이상)
+> macOS는 [Homebrew](https://brew.sh)로 `brew install node` 해도 됩니다. 설치 확인: `node -v`
 
 ### 1. 코드 받기
 
@@ -23,9 +24,17 @@
 
 ### 2. 설치 & 실행
 
+**Windows:**
 ```bash
 npm install                 # 의존성 설치 (최초 1회)
-copy .env.example .env      # 설정 파일 생성  (macOS/Linux: cp .env.example .env)
+copy .env.example .env      # 설정 파일 생성
+npm start                   # 서버 실행
+```
+
+**macOS / Linux:**
+```bash
+npm install                 # 의존성 설치 (최초 1회)
+cp .env.example .env        # 설정 파일 생성
 npm start                   # 서버 실행
 ```
 
