@@ -8,6 +8,36 @@
 |:---:|:---:|
 | <img src="docs/desktop.png" alt="MOLDLINE 데스크톱 화면" width="600" /> | <img src="docs/mobile.png" alt="MOLDLINE 모바일 화면" width="210" /> |
 
+## 다운로드 & 실행 (처음이라면 여기부터)
+
+> **준비물:** [Node.js LTS](https://nodejs.org) 설치 (18 버전 이상)
+
+### 1. 코드 받기
+
+- **방법 A — Git:**
+  ```bash
+  git clone https://github.com/JaydenWork/moldline.git
+  cd moldline
+  ```
+- **방법 B — ZIP:** GitHub 저장소 페이지 → 초록색 **Code** 버튼 → **Download ZIP** → 압축 풀기
+
+### 2. 설치 & 실행
+
+```bash
+npm install                 # 의존성 설치 (최초 1회)
+copy .env.example .env      # 설정 파일 생성  (macOS/Linux: cp .env.example .env)
+npm start                   # 서버 실행
+```
+
+→ 브라우저에서 **http://localhost:3000** 접속 (관리자 페이지: **/admin**)
+
+> `.env`는 받는 사람이 직접 채워야 합니다(디스코드 웹훅·관리자 비밀번호 등).
+> **비워둬도 화면·폼 제출·파일 저장은 정상 동작**하며, 알림 기능만 비활성화됩니다.
+
+### 화면만 빠르게 보고 싶다면
+
+`index.html`을 더블클릭하면 디자인은 바로 보입니다. 단, **폼 제출·관리자·알림 등 기능은 서버(`npm start`)가 있어야** 동작합니다.
+
 ## 구성
 
 | 파일 | 역할 |
@@ -16,21 +46,6 @@
 | `server.js` | Express 백엔드 — 정적 서빙, 대용량 파일 업로드, 이메일 알림 |
 | `.env.example` | 환경변수 템플릿 (복사해서 `.env`로 사용) |
 | `uploads/` | 업로드된 도면·이미지 저장 폴더 (자동 생성, git 제외) |
-
-## 빠른 시작
-
-```bash
-# 1. 의존성 설치
-npm install
-
-# 2. 환경변수 설정
-copy .env.example .env      # (Windows)   /   cp .env.example .env  (macOS/Linux)
-#   → .env 파일을 열어 SMTP 정보와 MAIL_TO를 입력
-
-# 3. 서버 실행
-npm start
-#   → http://localhost:3000 접속
-```
 
 개발 중 자동 재시작: `npm run dev` (Node 18+ 의 `--watch`).
 
