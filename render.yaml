@@ -26,8 +26,15 @@ services:
         value: admin
       - key: ADMIN_PASS
         sync: false      # ← 대시보드에서 강력한 비밀번호 입력
-      # 디스코드 알림
+      # 디스코드 알림 (무료 플랜 공용 IP는 Discord Cloudflare에 429로 막힐 수 있음 → 텔레그램 권장)
       - key: DISCORD_WEBHOOK_URL
         sync: false      # ← 대시보드에서 웹훅 URL 입력
       - key: DISCORD_ATTACH_LIMIT_MB
         value: "8"
+      # 텔레그램 알림 (데이터센터에서 안정적 — Cloudflare 봇 차단 없음)
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false      # ← 대시보드에서 봇 토큰 입력
+      - key: TELEGRAM_CHAT_ID
+        sync: false      # ← 대시보드에서 chat_id 입력
+      - key: TELEGRAM_ATTACH_LIMIT_MB
+        value: "50"

@@ -17,7 +17,8 @@ npm run dev   # 자동 재시작 (Node 18+)
 - **`server.js`(단일 파일)**: 모든 라우트·업로드·알림. `express.static(__dirname)`로 정적 서빙.
 - **`POST /api/submit`**: 공개 접수. multer로 파일을 `uploads/<접수번호>/`에 디스크 스트리밍 저장, 메타는 `_submission.json`.
 - **`/api/admin/*`**: HTTP Basic 인증(`crypto.timingSafeEqual`). `ADMIN_PASS` 미설정 시 503.
-- **알림은 접수와 독립**: 메일(nodemailer)·디스코드(웹훅)는 서로/접수와 독립. 실패해도 접수는 성공 처리 — 새 채널 추가 시도 이 원칙 유지.
+- **알림은 접수와 독립**: 메일(nodemailer)·디스코드(웹훅)·텔레그램(봇)은 서로/접수와 독립. 실패해도 접수는 성공 처리 — 새 채널 추가 시도 이 원칙 유지.
+- **데이터센터 IP 주의**: Discord는 Cloudflare가 클라우드(Render 등) 공용 IP를 429로 차단할 수 있음. `/api/health`의 `discordWebhookStatus:429`가 그 증상. 이 때문에 텔레그램(Cloudflare 봇 차단 없음)을 권장 채널로 추가함.
 - **프론트**: `script.js`(IIFE)가 드래그앤드롭·검증·`FormData` 전송. 별도 호스팅 시 `ENDPOINT` 상수를 전체 URL로 교체.
 
 ## 수정 시 함께 맞출 것

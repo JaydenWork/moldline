@@ -52,6 +52,14 @@ const DISCORD_WEBHOOK_ID = (DISCORD_WEBHOOK_URL.match(/webhooks\/(\d+)/) || [])[
 // Discord 앞단 Cloudflare가 UA 없는 데이터센터 요청을 차단(429 HTML)하므로 정상 UA를 명시
 const DISCORD_UA = "MOLDLINE-Webhook/1.0 (+https://moldline-ccvd.onrender.com)";
 
+// 텔레그램 알림 — Discord와 달리 Cloudflare 봇 차단이 없어 데이터센터(Render 등)에서 안정적.
+// @BotFather로 봇 생성 → 토큰, 봇과 대화방의 chat_id 필요. 봇 업로드 한도 50MB.
+const TELEGRAM_BOT_TOKEN = (process.env.TELEGRAM_BOT_TOKEN || "").trim();
+const TELEGRAM_CHAT_ID = (process.env.TELEGRAM_CHAT_ID || "").trim();
+const TELEGRAM_ATTACH_LIMIT = (Number(process.env.TELEGRAM_ATTACH_LIMIT_MB) || 50) * 1024 * 1024;
+const TELEGRAM_API = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN;
+const telegramReady = !!(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID);
+
 const UPLOAD_ROOT = path.join(__dirname, "uploads");
 fs.mkdirSync(UPLOAD_ROOT, { recursive: true });
 
@@ -150,6 +158,37 @@ if (DISCORD_WEBHOOK_URL) {
   }
 } else {
   console.warn("⚠️  DISCORD_WEBHOOK_URL 미설정 — 디스코드 알림 비활성화");
+}
+
+// 진단용: 시작 시 텔레그램 봇 토큰 유효성을 getMe로 1회 확인 (null=미확인)
+let telegramValid = null;
+let telegramStatus = null; // getMe 응답 상태코드 또는 오류 메시지
+let lastTelegram = null;   // 마지막 전송 시도 결과
+if (telegramReady) {
+  console.log("✓ 텔레그램 알림 활성화");
+  if (typeof fetch !== "function") {
+    telegramValid = false;
+    telegramStatus = "no-fetch";
+    console.warn("⚠️  전역 fetch 없음 (Node 18+ 필요) — 텔레그램 전송 불가:", process.version);
+  } else {
+    (async function () {
+      try {
+        const r = await fetch(TELEGRAM_API + "/getMe");
+        const j = await r.json().catch(function () { return {}; });
+        telegramValid = !!(r.ok && j.ok);
+        telegramStatus = r.status;
+        console.log(telegramValid
+          ? "✓ 텔레그램 봇 토큰 검증 통과 (@" + ((j.result && j.result.username) || "?") + ")"
+          : "⚠️  텔레그램 봇 토큰 무효 — status " + r.status + " (TELEGRAM_BOT_TOKEN 확인 필요)");
+      } catch (e) {
+        telegramValid = false;
+        telegramStatus = "error:" + e.message;
+        console.warn("⚠️  텔레그램 검증 중 오류:", e.message);
+      }
+    })();
+  }
+} else {
+  console.warn("⚠️  TELEGRAM_BOT_TOKEN/CHAT_ID 미설정 — 텔레그램 알림 비활성화");
 }
 
 function esc(s) {
@@ -329,6 +368,114 @@ async function notifyDiscord(data, files) {
 }
 
 /* ============================================================
+   텔레그램 알림 (봇)
+   - 문의가 오면 지정 채팅방으로 메시지 전송
+   - 한도(50MB) 내 첨부는 sendDocument로 동봉, 초과분은 목록으로 안내
+   ============================================================ */
+async function notifyTelegram(data, files) {
+  if (!telegramReady) return false;
+  if (typeof fetch !== "function") {
+    console.warn("⚠️  텔레그램 전송 불가 — 전역 fetch 없음 (Node 18+ 필요):", process.version);
+    return false;
+  }
+
+  // 첨부 선별 (개별·누적 모두 한도 이내)
+  const attach = [];
+  let total = 0;
+  for (const f of files) {
+    if (f.size <= TELEGRAM_ATTACH_LIMIT && total + f.size <= TELEGRAM_ATTACH_LIMIT) {
+      attach.push(f);
+      total += f.size;
+    }
+  }
+
+  // 메시지 본문 (HTML parse_mode, 4096자 제한)
+  function row(label, value) {
+    return "<b>" + esc(label) + ":</b> " + (esc(value) || "-");
+  }
+  const lines = [
+    "🔔 <b>새 제품화 의뢰가 접수되었습니다</b>",
+    "접수번호: <code>" + esc(data.submissionId) + "</code>",
+    "",
+    row("이름/회사", data.name),
+    row("연락처", data.phone),
+    row("이메일", data.email),
+    row("제품 분류", data.category),
+    row("예상 수량", data.qty),
+    row("예상 예산", data.budget),
+    "",
+    "<b>아이디어</b>",
+    esc(data.idea)
+  ];
+  if (files.length) {
+    lines.push("", "<b>첨부 (" + files.length + ")</b>");
+    files.forEach(function (f) {
+      const mb = (f.size / 1048576).toFixed(2);
+      const mark = attach.indexOf(f) >= 0 ? "📎" : "🗄️";
+      const tail = attach.indexOf(f) >= 0 ? "" : " (용량 초과 — 서버 보관)";
+      lines.push(mark + " " + esc(f.displayName) + " (" + mb + "MB)" + tail);
+    });
+  }
+  const text = lines.join("\n").slice(0, 4096);
+
+  // 1회 전송 + 429(레이트리밋) 시 retry_after 만큼 대기 후 재시도 (최대 3회)
+  async function send(makeRequest) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      let res;
+      try { res = await makeRequest(); }
+      catch (e) { return { ok: false, status: "error", body: e.message }; }
+      if (res.ok) return { ok: true, status: res.status, body: "" };
+      const body = await res.text().catch(function () { return ""; });
+      if (res.status === 429 && attempt < 3) {
+        let wait = 1500;
+        try {
+          const j = JSON.parse(body);
+          if (j.parameters && j.parameters.retry_after) wait = Math.min(Number(j.parameters.retry_after) * 1000 + 250, 8000);
+        } catch (e) {}
+        await new Promise(function (r) { setTimeout(r, wait); });
+        continue;
+      }
+      return { ok: false, status: res.status, body: body.slice(0, 200) };
+    }
+    return { ok: false, status: "retry-exhausted", body: "" };
+  }
+
+  // 메시지 먼저 전송
+  const msg = await send(function () {
+    return fetch(TELEGRAM_API + "/sendMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: text,
+        parse_mode: "HTML",
+        disable_web_page_preview: true
+      })
+    });
+  });
+  if (!msg.ok) {
+    lastTelegram = { at: new Date().toISOString(), ok: false, status: msg.status, body: msg.body };
+    console.warn("⚠️  텔레그램 전송 실패:", msg.status, msg.body);
+    return false;
+  }
+
+  // 한도 내 첨부를 문서로 전송 (재시도마다 폼을 새로 만들어야 하므로 클로저 내부에서 생성)
+  for (const f of attach) {
+    const buf = fs.readFileSync(f.path);
+    const dr = await send(function () {
+      const form = new FormData();
+      form.append("chat_id", TELEGRAM_CHAT_ID);
+      form.append("document", new Blob([buf]), f.displayName);
+      return fetch(TELEGRAM_API + "/sendDocument", { method: "POST", body: form });
+    });
+    if (!dr.ok) console.warn("⚠️  텔레그램 첨부 실패(" + f.displayName + "):", dr.status, String(dr.body).slice(0, 120));
+  }
+
+  lastTelegram = { at: new Date().toISOString(), ok: true, status: 200 };
+  return true;
+}
+
+/* ============================================================
    관리자 인증 (HTTP Basic) — /api/admin/* 보호
    ============================================================ */
 function timingSafeEqual(a, b) {
@@ -482,6 +629,12 @@ app.post("/api/submit", function (req, res) {
       discordSent = await notifyDiscord(data, files);
     }
 
+    // 텔레그램 알림 (메일·디스코드와 독립적으로, 실패해도 접수는 성공 처리)
+    let telegramSent = false;
+    if (telegramReady) {
+      telegramSent = await notifyTelegram(data, files);
+    }
+
     // 메일 발송
     if (mailReady) {
       const attachments = files
@@ -510,11 +663,11 @@ app.post("/api/submit", function (req, res) {
       } catch (e) {
         console.error("관리자 메일 발송 실패:", e.message);
         // 파일은 저장됐으므로 접수 자체는 성공 처리하되, 운영자가 로그로 확인
-        return res.json({ ok: true, submissionId: data.submissionId, mail: false, discord: discordSent });
+        return res.json({ ok: true, submissionId: data.submissionId, mail: false, discord: discordSent, telegram: telegramSent });
       }
     }
 
-    return res.json({ ok: true, submissionId: data.submissionId, mail: mailReady, discord: discordSent });
+    return res.json({ ok: true, submissionId: data.submissionId, mail: mailReady, discord: discordSent, telegram: telegramSent });
   });
 });
 
@@ -531,7 +684,11 @@ app.get("/api/health", function (req, res) {
     discordWebhookId: DISCORD_WEBHOOK_ID, // 적용된 웹훅 ID(토큰 제외)
     discordWebhookValid: discordWebhookValid, // true=URL유효, false=무효/fetch없음, null=미확인
     discordWebhookStatus: discordWebhookStatus, // GET 상태코드(401=토큰오류 등) 또는 오류
-    lastDiscord: lastDiscord // 마지막 전송 시도 결과(상태/본문)
+    lastDiscord: lastDiscord, // 마지막 전송 시도 결과(상태/본문)
+    telegram: telegramReady, // TELEGRAM_BOT_TOKEN+CHAT_ID 설정 여부
+    telegramValid: telegramValid, // true=토큰유효, false=무효/fetch없음, null=미확인
+    telegramStatus: telegramStatus, // getMe 상태코드 또는 오류
+    lastTelegram: lastTelegram // 마지막 전송 시도 결과
   });
 });
 
