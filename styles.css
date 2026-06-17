@@ -400,8 +400,11 @@ img { max-width: 100%; display: block; }
   transform: translateY(34px);
   transition: opacity 0.8s var(--ease), transform 0.8s var(--ease), filter 0.8s var(--ease);
   transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform;
+  /* will-change는 일부러 두지 않음 — 수십 개 요소에 영구로 걸면 GPU 레이어가 폭증해
+     스크롤 시 글자가 사라지거나 잘려 보이는 렌더링 버그가 남(transition만으로 충분히 부드러움) */
 }
+/* 등장 완료된 요소는 레이어 승격을 확실히 해제 */
+[data-reveal].is-in { will-change: auto; }
 [data-reveal="scale"] { transform: translateY(22px) scale(0.93); }
 [data-reveal="left"]  { transform: translateX(-48px); }
 [data-reveal="right"] { transform: translateX(48px); }
