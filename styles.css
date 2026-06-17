@@ -286,8 +286,10 @@ img { max-width: 100%; display: block; }
 
 /* ===== Media card (섹션 내 보조 이미지) ===== */
 .media-card { border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 44px; }
+/* 이미지 영역만 따로 잘라내 패럴럭스(scale·이동)가 아래 캡션을 침범하지 못하게 함 */
 .media-card img { width: 100%; height: 320px; object-fit: cover; display: block; }
-.media-card figcaption { padding: 14px 22px; background: var(--soft); color: var(--slate); font-size: 0.85rem; }
+/* 캡션을 이미지 위 레이어로 올림 — transform 걸린 이미지가 캡션 글자를 덮어 가리던 문제 방지 */
+.media-card figcaption { position: relative; z-index: 1; padding: 14px 22px; background: var(--soft); color: var(--slate); font-size: 0.85rem; }
 
 /* ===== Photo banner (섹션 사이 풀블리드 비주얼) ===== */
 .photo-banner { position: relative; min-height: 320px; overflow: hidden; display: flex; }
