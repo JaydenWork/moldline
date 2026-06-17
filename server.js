@@ -624,8 +624,19 @@ app.post("/api/submit", function (req, res) {
       return res.status(400).json({ ok: false, error: "이메일 형식이 올바르지 않습니다." });
     }
 
+    // 첨부 없는 의뢰도 전용 폴더를 만들어 admin 목록(폴더 단위 조회)에 노출시킴.
+    // multer destination은 파일이 있을 때만 실행되므로, 검증 통과 후 여기서 보강한다.
+    // (보강 안 하면 메타가 uploads/ 최상위에 저장돼 목록에 안 뜨고, 다음 무첨부 의뢰가 덮어씀)
+    if (!req._submissionId) {
+      const id = new Date().toISOString().replace(/[:.]/g, "-") +
+        "_" + crypto.randomBytes(3).toString("hex");
+      req._submissionId = id;
+      req._uploadDir = path.join(UPLOAD_ROOT, id);
+      fs.mkdirSync(req._uploadDir, { recursive: true });
+    }
+
     const data = {
-      submissionId: req._submissionId || "no-files",
+      submissionId: req._submissionId,
       name: b.name, phone: b.phone, email: b.email,
       category: b.category, qty: b.qty, budget: b.budget, idea: b.idea
     };
