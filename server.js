@@ -123,6 +123,7 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER) {
 // 진단용: 시작 시 웹훅 URL 유효성을 GET으로 1회 확인 (null=미확인)
 let discordWebhookValid = null;
 let discordWebhookStatus = null; // GET 응답 상태코드 또는 오류 메시지(진단용)
+let lastDiscord = null;          // 마지막 전송 시도 결과(진단용)
 if (DISCORD_WEBHOOK_URL) {
   console.log("✓ 디스코드 웹훅 알림 활성화");
   if (typeof fetch !== "function") {
@@ -275,38 +276,54 @@ async function notifyDiscord(data, files) {
     return false;
   }
 
-  try {
-    let res;
+  // 한 번 전송 시도 (multipart는 매 시도마다 새 폼 필요)
+  function sendOnce() {
     if (!attach.length) {
       // 첨부 없음 — 단순 JSON 전송 (multipart/FormData/Blob 불필요해 더 견고)
-      res = await fetch(DISCORD_WEBHOOK_URL, {
+      return fetch(DISCORD_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-    } else {
-      // 첨부 있음 — multipart로 파일 동봉
-      const form = new FormData();
-      form.append("payload_json", JSON.stringify(payload));
-      attach.forEach(function (f, i) {
-        const buf = fs.readFileSync(f.path);
-        form.append("files[" + i + "]", new Blob([buf]), f.displayName);
-      });
-      res = await fetch(DISCORD_WEBHOOK_URL, { method: "POST", body: form });
     }
-    if (!res.ok) {
+    // 첨부 있음 — multipart로 파일 동봉
+    const form = new FormData();
+    form.append("payload_json", JSON.stringify(payload));
+    attach.forEach(function (f, i) {
+      const buf = fs.readFileSync(f.path);
+      form.append("files[" + i + "]", new Blob([buf]), f.displayName);
+    });
+    return fetch(DISCORD_WEBHOOK_URL, { method: "POST", body: form });
+  }
+
+  // 429(레이트리밋)면 retry_after 만큼 대기 후 재시도 (최대 3회)
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await sendOnce();
+      if (res.ok) {
+        lastDiscord = { at: new Date().toISOString(), ok: true, status: res.status, attempt: attempt };
+        if (skipped.length) {
+          console.log("ℹ️  디스코드 첨부 제외(용량):", skipped.map(function (f) { return f.displayName; }).join(", "));
+        }
+        return true;
+      }
       const body = await res.text().catch(function () { return ""; });
-      console.warn("⚠️  디스코드 전송 실패:", res.status, body.slice(0, 200));
+      lastDiscord = { at: new Date().toISOString(), ok: false, status: res.status, attempt: attempt, body: body.slice(0, 200) };
+      console.warn("⚠️  디스코드 전송 실패(" + attempt + "회차):", res.status, body.slice(0, 200));
+      if (res.status === 429 && attempt < 3) {
+        let wait = 1500;
+        try { const j = JSON.parse(body); if (j.retry_after) wait = Math.min(Number(j.retry_after) * 1000 + 250, 8000); } catch (e) {}
+        await new Promise(function (r) { setTimeout(r, wait); });
+        continue;
+      }
+      return false;
+    } catch (e) {
+      lastDiscord = { at: new Date().toISOString(), ok: false, status: "error", attempt: attempt, body: e.message };
+      console.warn("⚠️  디스코드 전송 오류(" + attempt + "회차):", e.message);
       return false;
     }
-    if (skipped.length) {
-      console.log("ℹ️  디스코드 첨부 제외(용량):", skipped.map(function (f) { return f.displayName; }).join(", "));
-    }
-    return true;
-  } catch (e) {
-    console.warn("⚠️  디스코드 전송 오류:", e.message);
-    return false;
   }
+  return false;
 }
 
 /* ============================================================
@@ -511,7 +528,8 @@ app.get("/api/health", function (req, res) {
     discord: discordReady,
     discordWebhookId: DISCORD_WEBHOOK_ID, // 적용된 웹훅 ID(토큰 제외)
     discordWebhookValid: discordWebhookValid, // true=URL유효, false=무효/fetch없음, null=미확인
-    discordWebhookStatus: discordWebhookStatus // GET 상태코드(401=토큰오류 등) 또는 오류
+    discordWebhookStatus: discordWebhookStatus, // GET 상태코드(401=토큰오류 등) 또는 오류
+    lastDiscord: lastDiscord // 마지막 전송 시도 결과(상태/본문)
   });
 });
 
