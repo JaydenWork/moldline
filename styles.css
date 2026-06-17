@@ -172,21 +172,23 @@ img { max-width: 100%; display: block; }
 .card h3 { font-size: 1.18rem; font-weight: 700; margin-bottom: 10px; }
 .card p { color: var(--slate); font-size: 0.96rem; }
 
-/* ===== Portfolio (제작 가능 품목) — 가로 스크롤 캐러셀 ===== */
-.portfolio {
-  display: flex; gap: 22px; margin-top: 54px;
+/* ===== Portfolio (제작 가능 품목) — 핀 고정 가로 스크롤 ===== */
+.hscroll { position: relative; margin-top: 54px; }
+/* 폴백/모바일: 가로 스와이프 (회색 스크롤바는 숨김) */
+.hscroll__sticky {
   overflow-x: auto; overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 16px;          /* 스크롤바 자리 */
-  scroll-padding-left: 2px;
+  scrollbar-width: none; -ms-overflow-style: none;
 }
-.portfolio::-webkit-scrollbar { height: 8px; }
-.portfolio::-webkit-scrollbar-track { background: transparent; }
-.portfolio::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
-.portfolio::-webkit-scrollbar-thumb:hover { background: var(--slate); }
+.hscroll__sticky::-webkit-scrollbar { width: 0; height: 0; display: none; }
+/* 핀 모드: 섹션이 화면에 고정되고 JS가 트랙을 좌우로 이동시킴 */
+.hscroll.is-pinned .hscroll__sticky {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; align-items: center; overflow: hidden;
+}
+.portfolio { display: flex; gap: 22px; padding: 0 clamp(18px, 4vw, 24px); }
+.hscroll.is-pinned .portfolio { flex: 0 0 auto; will-change: transform; }
 .pcase {
-  flex: 0 0 clamp(258px, 31%, 340px); scroll-snap-align: start;
+  flex: 0 0 clamp(260px, 30vw, 360px);
   background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg);
   overflow: hidden; transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s;
 }

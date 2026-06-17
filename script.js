@@ -47,7 +47,7 @@
   /* 콘텐츠 그룹 — 순차 등장 */
   groupReveal(".stats__inner", ".stat", "up", 90);
   groupReveal(".cards", ".card", "up", 80);
-  groupReveal(".portfolio", ".pcase", "scale", 90);
+  /* 제작 사례 카드는 핀 고정 가로 스크롤로 등장하므로 reveal 제외 */
   groupReveal(".steps", ".step", "up", 90);
   groupReveal(".certs", ".cert", "scale", 55);
   groupReveal(".qc__steps", ".qc__step", "up", 70);
@@ -136,6 +136,40 @@
     });
   }
 
+  /* ============================================================
+     핀 고정 가로 스크롤 (#cases) — 세로 스크롤로 카드가 좌우로 이동
+     - 트랙 폭이 화면보다 넓고, 모션 허용·데스크톱일 때만 핀 모드
+     - 그 외(모바일/모션축소)는 CSS 폴백(가로 스와이프, 스크롤바 숨김)
+     ============================================================ */
+  var hs = document.getElementById("casesHscroll");
+  var hsTrack = hs ? hs.querySelector(".portfolio") : null;
+  var hsMaxX = 0, hsEnabled = false;
+  function hsCanPin() {
+    return !!hs && !!hsTrack && !prefersReduced &&
+      window.innerWidth >= 768 && hsTrack.scrollWidth > window.innerWidth + 40;
+  }
+  function hsMeasure() {
+    if (!hs || !hsTrack) return;
+    var should = hsCanPin();
+    if (should && !hsEnabled) { hsEnabled = true; hs.classList.add("is-pinned"); }
+    else if (!should && hsEnabled) {
+      hsEnabled = false; hs.classList.remove("is-pinned");
+      hs.style.height = ""; hsTrack.style.transform = "";
+    }
+    if (hsEnabled) {
+      hsMaxX = Math.max(0, hsTrack.scrollWidth - window.innerWidth);
+      hs.style.height = (window.innerHeight + hsMaxX) + "px";
+    }
+  }
+  function hsUpdate() {
+    if (!hsEnabled) return;
+    var top = hs.getBoundingClientRect().top;
+    var scrolled = Math.min(Math.max(-top, 0), hsMaxX);
+    hsTrack.style.transform = "translate3d(" + (-scrolled).toFixed(1) + "px,0,0)";
+  }
+  hsMeasure();
+  window.addEventListener("load", function () { hsMeasure(); hsUpdate(); });
+
   var heroInner = document.querySelector(".hero__inner");
   var heroGrid = document.querySelector(".hero__grid");
 
@@ -161,6 +195,9 @@
       var shift = (-prog * 26).toFixed(1);
       img.style.transform = "translate3d(0," + shift + "px,0) scale(1.18)";
     });
+
+    /* 핀 고정 가로 스크롤 위치 갱신 */
+    hsUpdate();
   }
 
   var fxTicking = false;
@@ -171,7 +208,7 @@
     }
   }
   window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll, { passive: true });
+  window.addEventListener("resize", function () { hsMeasure(); onScroll(); }, { passive: true });
   onScrollFx();
 
   /* ============================================================
