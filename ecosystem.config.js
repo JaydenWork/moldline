@@ -26,6 +26,21 @@ module.exports = {
       error_file: "./logs/error.log",
       merge_logs: true,
       time: true
+    },
+    {
+      // 텔레그램 유지보수 봇 — 항상 켜진 PC에서 실행 (Claude Code 헤드리스로 수정·커밋)
+      name: "moldline-bot",
+      script: "bot/maintainer.js",
+      cwd: __dirname,
+      exec_mode: "fork",
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: "300M",
+      out_file: "./logs/bot-out.log",
+      error_file: "./logs/bot-error.log",
+      merge_logs: true,
+      time: true
     }
   ]
 };
