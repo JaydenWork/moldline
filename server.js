@@ -43,7 +43,7 @@ const MAX_TOTAL_SIZE = (Number(process.env.MAX_TOTAL_SIZE_MB) || 60) * 1024 * 10
 const EMAIL_ATTACH_LIMIT = (Number(process.env.EMAIL_ATTACH_LIMIT_MB) || 20) * 1024 * 1024;
 
 // 디스코드 웹훅 — 설정 시 문의 알림 전송. 첨부 총량 한도(기본 8MB: 디스코드 무료 한도)
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "";
+const DISCORD_WEBHOOK_URL = (process.env.DISCORD_WEBHOOK_URL || "").trim();
 const DISCORD_ATTACH_LIMIT = (Number(process.env.DISCORD_ATTACH_LIMIT_MB) || 8) * 1024 * 1024;
 const DISCORD_MENTION = process.env.DISCORD_MENTION || ""; // 예: "@here" 또는 "<@&역할ID>"
 const discordReady = !!DISCORD_WEBHOOK_URL;
@@ -122,21 +122,25 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER) {
 
 // 진단용: 시작 시 웹훅 URL 유효성을 GET으로 1회 확인 (null=미확인)
 let discordWebhookValid = null;
-if (process.env.DISCORD_WEBHOOK_URL) {
+let discordWebhookStatus = null; // GET 응답 상태코드 또는 오류 메시지(진단용)
+if (DISCORD_WEBHOOK_URL) {
   console.log("✓ 디스코드 웹훅 알림 활성화");
   if (typeof fetch !== "function") {
     discordWebhookValid = false;
+    discordWebhookStatus = "no-fetch";
     console.warn("⚠️  이 Node 런타임에 전역 fetch가 없습니다 (Node 18+ 필요) — 디스코드 전송 불가:", process.version);
   } else {
     (async function () {
       try {
         const r = await fetch(DISCORD_WEBHOOK_URL, { method: "GET" });
         discordWebhookValid = r.ok;
+        discordWebhookStatus = r.status;
         console.log(discordWebhookValid
           ? "✓ 디스코드 웹훅 URL 검증 통과"
           : "⚠️  디스코드 웹훅 URL 무효 — status " + r.status + " (대시보드 DISCORD_WEBHOOK_URL 확인 필요)");
       } catch (e) {
         discordWebhookValid = false;
+        discordWebhookStatus = "error:" + e.message;
         console.warn("⚠️  디스코드 웹훅 검증 중 오류:", e.message);
       }
     })();
@@ -506,7 +510,8 @@ app.get("/api/health", function (req, res) {
     mail: mailReady,
     discord: discordReady,
     discordWebhookId: DISCORD_WEBHOOK_ID, // 적용된 웹훅 ID(토큰 제외)
-    discordWebhookValid: discordWebhookValid // true=URL유효, false=무효/fetch없음, null=미확인
+    discordWebhookValid: discordWebhookValid, // true=URL유효, false=무효/fetch없음, null=미확인
+    discordWebhookStatus: discordWebhookStatus // GET 상태코드(401=토큰오류 등) 또는 오류
   });
 });
 
