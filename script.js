@@ -412,7 +412,7 @@
           submitBtn.disabled = false;
           submitBtn.textContent = "의뢰 보내기";
           var detail = err && err.message && err.message !== "server" ? " (" + err.message + ")" : "";
-          setNote("전송 중 오류가 발생했습니다" + detail + ". 잠시 후 다시 시도하거나 contact@moldline.kr로 보내주세요.", "err");
+          setNote("전송 중 오류가 발생했습니다" + detail + ". 잠시 후 다시 시도하거나 kkangg92@gmail.com로 보내주세요.", "err");
         });
     });
   }
