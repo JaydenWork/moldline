@@ -8,6 +8,23 @@
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  /* ---- 카카오톡 상담 채널 ----
+     window.MOLDLINE_KAKAO_URL 이 설정돼 있으면 [data-kakao] 링크에 주소를 연결하고
+     관련 요소를 노출, 미설정 시 깨진 링크 대신 모두 숨김. */
+  var kakaoUrl = (window.MOLDLINE_KAKAO_URL || "").trim();
+  document.querySelectorAll("[data-kakao]").forEach(function (el) {
+    if (kakaoUrl) {
+      el.setAttribute("href", kakaoUrl);
+      el.setAttribute("target", "_blank");
+      el.setAttribute("rel", "noopener noreferrer");
+      el.hidden = false;
+    } else {
+      el.hidden = true;
+    }
+  });
+  // 카카오 채널이 있을 때만 함께 보이는 보조 문구/래퍼
+  document.querySelectorAll("[data-kakao-or]").forEach(function (el) { el.hidden = !kakaoUrl; });
+
   /* ---- 모바일 메뉴 ---- */
   var nav = document.getElementById("nav");
   var navToggle = document.getElementById("navToggle");

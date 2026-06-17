@@ -513,6 +513,30 @@ img { max-width: 100%; display: block; }
   display: none;
 }
 
+/* ===== 카카오톡 상담 ===== */
+.kakao-fab {
+  position: fixed; right: 18px; bottom: 18px; z-index: 91;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #FEE500; color: #3C1E1E; font-weight: 700; font-size: 0.95rem;
+  padding: 12px 18px 12px 15px; border-radius: 999px;
+  box-shadow: 0 12px 30px -8px rgba(20, 16, 0, 0.45);
+  transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+.kakao-fab:hover { transform: translateY(-2px); box-shadow: 0 16px 38px -10px rgba(20, 16, 0, 0.55); }
+.kakao-fab svg { width: 22px; height: 22px; flex: none; }
+
+/* 카카오 인라인 버튼 (의뢰 폼 상단) */
+.btn--kakao { background: #FEE500; color: #3C1E1E; border-color: #FEE500; }
+.btn--kakao:hover { background: #f4dc00; transform: translateY(-2px); }
+.btn--kakao svg { width: 20px; height: 20px; }
+.contact-channels { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 28px; }
+.contact-channels__or { font-size: 0.88rem; color: rgba(255, 255, 255, 0.55); }
+
+/* 푸터 카카오 링크 */
+.footer__kakao { margin-top: 6px; }
+.footer__kakao a { color: rgba(255, 255, 255, 0.7); font-size: 0.92rem; transition: color 0.18s; }
+.footer__kakao a:hover { color: #FEE500; }
+
 /* ===== 스크롤 인터랙션 (애플 스타일 reveal) ===== */
 [data-reveal] {
   opacity: 0;
@@ -594,7 +618,7 @@ img { max-width: 100%; display: block; }
   .form { padding: 26px 20px; }
   .form__row { grid-template-columns: 1fr; gap: 0; }
   .footer__inner { grid-template-columns: 1fr; }
-  .floating-cta { display: inline-block; }
+  .floating-cta { display: inline-block; bottom: 80px; }  /* 카카오 플로팅 버튼 위로 스택 */
 
   .media-card img { height: 200px; }
   .photo-banner { min-height: 220px; }

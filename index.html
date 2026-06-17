@@ -757,6 +757,15 @@
       <h2 class="section__title">아이디어 의뢰하기</h2>
       <p class="section__lead">아래 정보를 남겨주시면 검토 후 영업일 기준 1~2일 내에 연락드립니다.</p>
 
+      <!-- 카카오톡 즉시 상담 (채널 URL 미설정 시 자동 숨김) -->
+      <div class="contact-channels" data-kakao-or hidden>
+        <a href="#" class="btn btn--kakao btn--lg" data-kakao hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.48 3 2 6.58 2 11c0 2.86 1.93 5.36 4.84 6.78-.21.74-.77 2.7-.88 3.12-.14.52.19.51.4.37.16-.11 2.6-1.77 3.66-2.49.63.09 1.29.14 1.98.14 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>
+          카카오톡으로 바로 상담하기
+        </a>
+        <span class="contact-channels__or" data-kakao-or hidden>또는 아래 양식으로 의뢰를 남겨주세요</span>
+      </div>
+
       <form class="form" id="ideaForm" novalidate>
         <div class="form__row">
           <div class="field">
@@ -894,6 +903,7 @@
       </div>
       <div class="footer__contact">
         <p>문의: <a href="mailto:contact@moldline.kr">contact@moldline.kr</a></p>
+        <p class="footer__kakao" data-kakao-or hidden><a href="#" data-kakao hidden>💬 카카오톡 채널 상담</a></p>
         <ul class="footer__badges">
           <li>🔒 NDA 기반 보안</li>
           <li>💬 한국어 직접 소통</li>
@@ -903,7 +913,19 @@
     </div>
   </footer>
 
+  <!-- 카카오톡 상담 플로팅 버튼 (채널 URL 미설정 시 자동 숨김) -->
+  <a href="#" class="kakao-fab" data-kakao hidden aria-label="카카오톡 상담">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.48 3 2 6.58 2 11c0 2.86 1.93 5.36 4.84 6.78-.21.74-.77 2.7-.88 3.12-.14.52.19.51.4.37.16-.11 2.6-1.77 3.66-2.49.63.09 1.29.14 1.98.14 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>
+    <span>카톡 상담</span>
+  </a>
+
   <a href="#submit" class="floating-cta" aria-label="의뢰하기">의뢰하기</a>
+
+  <!-- ▼ 카카오톡 채널 연동: 아래 주석을 풀고 실제 채널 URL로 교체하면 위 버튼들이 활성화됩니다.
+       채널 URL 형식: https://pf.kakao.com/_채널아이디/chat  (채팅 바로 열기)
+       또는           https://pf.kakao.com/_채널아이디        (채널 홈)
+       카카오톡 채널 관리자센터 > 채널 정보에서 'URL'을 복사하세요. -->
+  <script>window.MOLDLINE_KAKAO_URL = "https://invite.kakao.com/tc/wSXvmSOnJ3";</script>
 
   <!-- 백엔드를 별도 서버에 배포한 경우, 아래 주석을 풀고 실제 백엔드 주소로 교체하세요.
        (프론트+백엔드를 한 서버에서 서빙하면 설정 불필요) -->
