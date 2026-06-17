@@ -500,7 +500,8 @@ function adminAuth(req, res, next) {
     const p = decoded.slice(idx + 1);
     if (timingSafeEqual(u, user) && timingSafeEqual(p, pass)) return next();
   }
-  res.set("WWW-Authenticate", 'Basic realm="MOLDLINE Admin"');
+  // WWW-Authenticate 헤더는 일부러 생략 — 이게 있으면 브라우저가 기본 Basic 인증 팝업을
+  // 띄움. admin.html의 커스텀 로그인 폼이 Authorization 헤더로 인증을 처리하므로 불필요(중복 팝업 방지).
   return res.status(401).json({ ok: false, error: "인증이 필요합니다." });
 }
 
@@ -566,6 +567,26 @@ app.get("/api/admin/download", function (req, res) {
   }
   const display = file.split("__").slice(1).join("__") || file;
   res.download(target, display);
+});
+
+// 접수 1건 삭제 (폴더+첨부 통째로). id는 query로 전달.
+app.post("/api/admin/delete", function (req, res) {
+  const id = String(req.query.id || "");
+  // id 형식 화이트리스트 (다운로드와 동일) — 경로 구분자/상위경로 차단
+  if (!/^[\w.\-]+$/.test(id)) {
+    return res.status(400).json({ ok: false, error: "잘못된 요청입니다." });
+  }
+  const dir = path.join(UPLOAD_ROOT, id);
+  // 경로 이탈 방지 — UPLOAD_ROOT 바로 아래 폴더만 허용
+  const rel = path.relative(UPLOAD_ROOT, dir);
+  if (rel === "" || rel.startsWith("..") || path.isAbsolute(rel) || rel.indexOf(path.sep) >= 0) {
+    return res.status(400).json({ ok: false, error: "잘못된 경로입니다." });
+  }
+  if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) {
+    return res.status(404).json({ ok: false, error: "접수를 찾을 수 없습니다." });
+  }
+  fs.rmSync(dir, { recursive: true, force: true });
+  return res.json({ ok: true, deleted: id });
 });
 
 /* ---- 정적 프론트엔드 ---- */
