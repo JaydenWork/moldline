@@ -47,6 +47,8 @@ const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "";
 const DISCORD_ATTACH_LIMIT = (Number(process.env.DISCORD_ATTACH_LIMIT_MB) || 8) * 1024 * 1024;
 const DISCORD_MENTION = process.env.DISCORD_MENTION || ""; // 예: "@here" 또는 "<@&역할ID>"
 const discordReady = !!DISCORD_WEBHOOK_URL;
+// 진단용: 적용된 웹훅의 ID 부분만(토큰 제외) — 어떤 URL이 배포에 반영됐는지 식별
+const DISCORD_WEBHOOK_ID = (DISCORD_WEBHOOK_URL.match(/webhooks\/(\d+)/) || [])[1] || null;
 
 const UPLOAD_ROOT = path.join(__dirname, "uploads");
 fs.mkdirSync(UPLOAD_ROOT, { recursive: true });
@@ -498,10 +500,12 @@ app.get("/api/health", function (req, res) {
   res.json({
     ok: true,
     node: process.version,
+    uptimeSec: Math.round(process.uptime()),
     hasFetch: typeof fetch === "function",
     hasFormData: typeof FormData === "function",
     mail: mailReady,
     discord: discordReady,
+    discordWebhookId: DISCORD_WEBHOOK_ID, // 적용된 웹훅 ID(토큰 제외)
     discordWebhookValid: discordWebhookValid // true=URL유효, false=무효/fetch없음, null=미확인
   });
 });
