@@ -32,6 +32,8 @@ pm2 logs moldline-bot
 pm2 save                         # 부팅 자동 실행 등록(별도 OS 설정 필요)
 ```
 
+> 🖥️ **다른 PC로 옮기려면** → [MIGRATE.md](./MIGRATE.md) 참고 (봇은 동시에 한 대에서만 실행).
+
 ## 사용법
 
 봇과의 대화창에 그냥 한국어로 지시:
