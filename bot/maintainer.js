@@ -20,14 +20,15 @@ const { spawn, execSync } = require("child_process");
 const REPO = path.resolve(__dirname, "..");
 require("dotenv").config({ path: path.join(REPO, ".env") });
 
-const TOKEN = (process.env.TELEGRAM_BOT_TOKEN || "").trim();
+// 유지보수 봇은 알림 봇과 분리: 전용 토큰(@moldline_bot2)을 우선 사용, 없으면 알림 토큰으로 폴백
+const TOKEN = (process.env.TELEGRAM_MAINTAINER_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || "").trim();
 const API = "https://api.telegram.org/bot" + TOKEN;
 const ALLOWED = (process.env.TELEGRAM_MAINTAINER_CHAT_IDS || process.env.TELEGRAM_CHAT_ID || "")
   .split(",").map(function (s) { return s.trim(); }).filter(Boolean);
 const AUTO_PUSH = /^(1|true|yes)$/i.test(process.env.AUTO_PUSH || "");
 const CLAUDE_TIMEOUT_MS = (Number(process.env.BOT_CLAUDE_TIMEOUT_SEC) || 600) * 1000;
 
-if (!TOKEN) { console.error("❌ TELEGRAM_BOT_TOKEN 미설정 — .env 확인"); process.exit(1); }
+if (!TOKEN) { console.error("❌ 봇 토큰 미설정 — .env 의 TELEGRAM_MAINTAINER_BOT_TOKEN(권장) 또는 TELEGRAM_BOT_TOKEN 확인"); process.exit(1); }
 if (!ALLOWED.length) { console.error("❌ 허용 chat ID 없음 — TELEGRAM_CHAT_ID 또는 TELEGRAM_MAINTAINER_CHAT_IDS 설정"); process.exit(1); }
 
 /* ---- Claude Code 실행 파일 경로 해석 ---- */

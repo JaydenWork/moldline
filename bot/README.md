@@ -14,7 +14,8 @@
 
 | 키 | 설명 |
 |---|---|
-| `TELEGRAM_BOT_TOKEN` | @BotFather 봇 토큰 (필수) |
+| `TELEGRAM_MAINTAINER_BOT_TOKEN` | **유지보수 전용 봇**(@moldline_bot2) 토큰. 권장 — 알림 봇과 분리. 없으면 아래로 폴백 |
+| `TELEGRAM_BOT_TOKEN` | 알림용 봇 토큰. 유지보수 전용 토큰이 없을 때 폴백으로 사용 |
 | `TELEGRAM_CHAT_ID` | 명령을 허용할 본인 chat ID (필수, 보안 핵심) |
 | `TELEGRAM_MAINTAINER_CHAT_IDS` | (선택) 여러 명 허용 시 쉼표 구분. 없으면 `TELEGRAM_CHAT_ID` 사용 |
 | `AUTO_PUSH` | `true`면 커밋 직후 자동 배포. 기본 `false`(텔레그램 `/push` 승인 필요) |
