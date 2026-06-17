@@ -303,9 +303,12 @@
          - Formspree 등 폼 서비스 URL
          연동 전까지는 데모 모드로 동작합니다.
          -------------------------------------------------------- */
-      // Node 백엔드(server.js)와 같은 서버에서 서빙되므로 상대 경로 사용.
-      // 프론트엔드를 별도 호스팅한다면 전체 URL로 교체하세요. (예: "https://api.moldline.kr/api/submit")
-      var ENDPOINT = "/api/submit";
+      // 프론트와 백엔드가 같은 서버면 상대 경로(/api/submit)로 충분.
+      // 프론트를 별도 호스팅(Netlify 등)하면 index.html에서
+      //   window.MOLDLINE_API_BASE = "https://백엔드주소";
+      // 를 지정하세요. 비어 있으면 동일 출처로 요청합니다.
+      var API_BASE = (window.MOLDLINE_API_BASE || "").replace(/\/+$/, "");
+      var ENDPOINT = API_BASE + "/api/submit";
 
       fetch(ENDPOINT, { method: "POST", body: fd, headers: { Accept: "application/json" } })
         .then(function (res) {

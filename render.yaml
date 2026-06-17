@@ -1,0 +1,33 @@
+# Render 블루프린트 — MOLDLINE 백엔드(server.js)
+# 사용법: Render 대시보드 → New + → Blueprint → 이 저장소 선택 → Apply.
+# 비밀값(DISCORD_WEBHOOK_URL, ADMIN_PASS)은 sync:false 라서 리포에 저장되지 않고
+# 배포 시 대시보드에서 직접 입력하게 됩니다.
+#
+# ⚠️ 무료 플랜은 디스크가 임시(재배포 시 uploads/ 초기화) + 미사용 시 슬립.
+#    의뢰 알림은 디스코드로 즉시 전송되므로 접수 자체는 동작합니다.
+#    파일 영속 보관이 필요해지면 plan을 올리고 디스크(disk:)를 붙이세요.
+services:
+  - type: web
+    name: moldline
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      # 별도 호스팅한 프론트(Netlify)에서의 호출 허용 출처
+      - key: CORS_ORIGINS
+        value: https://moldline.netlify.app
+      # 의뢰 1건 첨부 총합 한도(MB)
+      - key: MAX_TOTAL_SIZE_MB
+        value: "60"
+      # 관리자 페이지(/admin) 계정
+      - key: ADMIN_USER
+        value: admin
+      - key: ADMIN_PASS
+        sync: false      # ← 대시보드에서 강력한 비밀번호 입력
+      # 디스코드 알림
+      - key: DISCORD_WEBHOOK_URL
+        sync: false      # ← 대시보드에서 웹훅 URL 입력
+      - key: DISCORD_ATTACH_LIMIT_MB
+        value: "8"

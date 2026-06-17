@@ -17,6 +17,23 @@ const nodemailer = require("nodemailer");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+/* ---- CORS (별도 호스팅된 프론트엔드에서 호출 허용) ----
+   CORS_ORIGINS: 쉼표로 구분한 허용 출처 목록(예: "https://moldline.netlify.app,https://moldline.kr").
+   비워두면 동일 출처에서만 동작(프론트+백엔드를 한 서버에서 서빙하는 기존 방식). */
+const CORS_ORIGINS = (process.env.CORS_ORIGINS || "")
+  .split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+app.use(function (req, res, next) {
+  const origin = req.headers.origin;
+  if (origin && CORS_ORIGINS.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization");
+  }
+  if (req.method === "OPTIONS") return res.sendStatus(204); // 프리플라이트
+  next();
+});
+
 /* ---- 업로드 설정 ---- */
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 개당 50MB
