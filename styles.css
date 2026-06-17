@@ -86,8 +86,13 @@ img { max-width: 100%; display: block; }
 .logo__text { font-weight: 900; font-size: 1.22rem; letter-spacing: 0.02em; }
 .logo__text span { color: var(--accent); }
 .nav__links { display: flex; gap: 26px; margin-left: auto; }
-.nav__links a { color: rgba(255,255,255,0.82); font-size: 0.94rem; font-weight: 500; transition: color 0.2s; }
+.nav__links a { position: relative; color: rgba(255,255,255,0.82); font-size: 0.94rem; font-weight: 500; transition: color 0.2s; }
 .nav__links a:hover { color: var(--accent); }
+.nav__links a.is-active { color: var(--accent); }
+.nav__links a.is-active::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -7px;
+  height: 2px; background: var(--accent); border-radius: 2px;
+}
 .nav__cta { margin-left: 4px; }
 .nav__toggle { display: none; background: none; border: 0; cursor: pointer; flex-direction: column; gap: 5px; padding: 8px; }
 .nav__toggle span { width: 24px; height: 2px; background: #fff; border-radius: 2px; transition: transform 0.3s, opacity 0.3s; }
@@ -167,9 +172,21 @@ img { max-width: 100%; display: block; }
 .card h3 { font-size: 1.18rem; font-weight: 700; margin-bottom: 10px; }
 .card p { color: var(--slate); font-size: 0.96rem; }
 
-/* ===== Portfolio (제작 가능 품목) ===== */
-.portfolio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 54px; }
+/* ===== Portfolio (제작 가능 품목) — 가로 스크롤 캐러셀 ===== */
+.portfolio {
+  display: flex; gap: 22px; margin-top: 54px;
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 16px;          /* 스크롤바 자리 */
+  scroll-padding-left: 2px;
+}
+.portfolio::-webkit-scrollbar { height: 8px; }
+.portfolio::-webkit-scrollbar-track { background: transparent; }
+.portfolio::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+.portfolio::-webkit-scrollbar-thumb:hover { background: var(--slate); }
 .pcase {
+  flex: 0 0 clamp(258px, 31%, 340px); scroll-snap-align: start;
   background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg);
   overflow: hidden; transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s;
 }
@@ -417,6 +434,17 @@ img { max-width: 100%; display: block; }
 /* 이미지 패럴럭스 — 컨테이너보다 살짝 크게 두고 스크롤에 따라 이동 */
 .has-parallax { transform: scale(1.18); will-change: transform; }
 
+/* ===== 데스크톱 전용 스크롤 연출 ===== */
+@media (min-width: 901px) {
+  /* 풀페이지 느낌의 부드러운 스냅 — proximity라 긴 본문을 가두지 않고 풀블리드 비주얼만 정렬 */
+  html { scroll-snap-type: y proximity; }
+  .hero, .photo-banner { scroll-snap-align: start; scroll-margin-top: 70px; }
+
+  /* 텍스트 고정 — 신뢰 섹션 좌측 설명이 머무는 동안 우측 패널만 흐르게 */
+  .trust__inner { align-items: start; }
+  .trust__text { position: sticky; top: 100px; }
+}
+
 /* ============================================================
    Responsive
    ============================================================ */
@@ -455,7 +483,7 @@ img { max-width: 100%; display: block; }
   .stat:nth-child(-n+2) { border-bottom: 1px solid rgba(26,20,0,0.12); }
 
   .cards { grid-template-columns: 1fr; }
-  .portfolio { grid-template-columns: 1fr; }
+  .pcase { flex-basis: 80%; }            /* 모바일: 가로 스크롤로 한 장씩(+살짝 다음 카드) */
   .steps { grid-template-columns: 1fr; }
   .certs { grid-template-columns: repeat(2, 1fr); }
   .qc { padding: 28px 20px; }

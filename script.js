@@ -81,9 +81,10 @@
 
   /* IntersectionObserver — 뷰포트 진입 시 등장 */
   if (!prefersReduced && "IntersectionObserver" in window) {
+    // 진입 시 등장, 이탈 시 원위치 — 스크롤을 내렸다 올리면 효과가 반대로 다시 재생됨(양방향)
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
+        e.target.classList.toggle("is-in", e.isIntersecting);
       });
     }, { threshold: 0.08, rootMargin: "0px 0px -8% 0px" });
     document.querySelectorAll("[data-reveal]").forEach(function (el) {
@@ -101,6 +102,30 @@
       });
     });
   }
+
+  /* ============================================================
+     스크롤 스파이 — 화면 중앙에 걸린 섹션에 따라 nav 링크 강조(상태 변경)
+     ============================================================ */
+  (function () {
+    var links = {};
+    document.querySelectorAll('.nav__links a[href^="#"]').forEach(function (a) {
+      var id = a.getAttribute("href").slice(1);
+      if (id) links[id] = a;
+    });
+    var targets = Object.keys(links)
+      .map(function (id) { return document.getElementById(id); })
+      .filter(Boolean);
+    if (!("IntersectionObserver" in window) || !targets.length) return;
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        Object.keys(links).forEach(function (id) {
+          links[id].classList.toggle("is-active", id === e.target.id);
+        });
+      });
+    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
+    targets.forEach(function (t) { spy.observe(t); });
+  })();
 
   /* 이미지 패럴럭스 대상 */
   var parallaxImgs = [];
