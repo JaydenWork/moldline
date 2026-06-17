@@ -579,22 +579,23 @@
           <p class="docsamples__lead">아래는 실제로 제공되는 문서 양식의 예시입니다. 세부 내용은 프로젝트별로 발급되며, 보안을 위해 블러 처리했습니다.</p>
           <div class="docsamples__grid">
 
+            <!-- 재질성적서: 빽빽한 데이터 표 (스틸 블루) -->
             <figure class="docsample">
               <div class="docsample__view">
-                <div class="docsheet" aria-hidden="true">
+                <div class="docsheet docsheet--material" aria-hidden="true">
                   <div class="docsheet__head">
                     <span class="docsheet__mark"></span>
                     <span class="docsheet__titlebar"></span>
                   </div>
-                  <div class="docsheet__lines"><span></span><span></span><span></span></div>
-                  <div class="docsheet__table">
+                  <div class="docsheet__lines"><span></span></div>
+                  <div class="docsheet__grid">
+                    <i></i><i></i><i></i><i></i>
                     <i></i><i></i><i></i><i></i>
                     <i></i><i></i><i></i><i></i>
                     <i></i><i></i><i></i><i></i>
                     <i></i><i></i><i></i><i></i>
                     <i></i><i></i><i></i><i></i>
                   </div>
-                  <span class="docsheet__stamp"></span>
                 </div>
                 <span class="docsample__wm">SAMPLE</span>
                 <span class="docsample__badge">🔒 예시</span>
@@ -605,21 +606,19 @@
               </figcaption>
             </figure>
 
+            <!-- 검사성적서(COC): 체크리스트 + 합격 도장 (그린) -->
             <figure class="docsample">
               <div class="docsample__view">
-                <div class="docsheet" aria-hidden="true">
+                <div class="docsheet docsheet--coc" aria-hidden="true">
                   <div class="docsheet__head">
                     <span class="docsheet__mark"></span>
                     <span class="docsheet__titlebar"></span>
                   </div>
                   <div class="docsheet__lines"><span></span><span></span></div>
-                  <div class="docsheet__table docsheet__table--check">
-                    <i></i><i></i><i></i><i></i>
-                    <i></i><i></i><i></i><i></i>
-                    <i></i><i></i><i></i><i></i>
-                    <i></i><i></i><i></i><i></i>
+                  <div class="docsheet__checklist">
+                    <span></span><span></span><span></span><span></span>
                   </div>
-                  <span class="docsheet__stamp docsheet__stamp--lg"></span>
+                  <span class="docsheet__seal">PASS<br>合格</span>
                 </div>
                 <span class="docsample__wm">SAMPLE</span>
                 <span class="docsample__badge">🔒 예시</span>
@@ -630,18 +629,20 @@
               </figcaption>
             </figure>
 
+            <!-- 치수검사 보고서: 치수선·화살표 도면 (틸) -->
             <figure class="docsample">
               <div class="docsample__view">
-                <div class="docsheet" aria-hidden="true">
+                <div class="docsheet docsheet--dim" aria-hidden="true">
                   <div class="docsheet__head">
                     <span class="docsheet__mark"></span>
                     <span class="docsheet__titlebar"></span>
                   </div>
-                  <div class="docsheet__draw"></div>
-                  <div class="docsheet__table">
-                    <i></i><i></i><i></i><i></i>
-                    <i></i><i></i><i></i><i></i>
+                  <div class="docsheet__dim">
+                    <span class="docsheet__dim-shape"></span>
+                    <span class="docsheet__dim-h"></span>
+                    <span class="docsheet__dim-v"></span>
                   </div>
+                  <div class="docsheet__lines"><span></span><span></span></div>
                 </div>
                 <span class="docsample__wm">SAMPLE</span>
                 <span class="docsample__badge">🔒 예시</span>
@@ -652,15 +653,18 @@
               </figcaption>
             </figure>
 
+            <!-- 신뢰성 시험 리포트: 축이 있는 그래프 (앰버) -->
             <figure class="docsample">
               <div class="docsample__view">
-                <div class="docsheet" aria-hidden="true">
+                <div class="docsheet docsheet--rel" aria-hidden="true">
                   <div class="docsheet__head">
                     <span class="docsheet__mark"></span>
                     <span class="docsheet__titlebar"></span>
                   </div>
-                  <div class="docsheet__lines"><span></span></div>
-                  <div class="docsheet__chart"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="docsheet__chart">
+                    <span class="docsheet__trend"></span>
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                  </div>
                   <div class="docsheet__lines"><span></span><span></span></div>
                 </div>
                 <span class="docsample__wm">SAMPLE</span>
@@ -672,14 +676,19 @@
               </figcaption>
             </figure>
 
+            <!-- 금형 사양서: 금형 단면도 (오렌지) -->
             <figure class="docsample">
               <div class="docsample__view">
-                <div class="docsheet" aria-hidden="true">
+                <div class="docsheet docsheet--mold" aria-hidden="true">
                   <div class="docsheet__head">
                     <span class="docsheet__mark"></span>
                     <span class="docsheet__titlebar"></span>
                   </div>
-                  <div class="docsheet__draw docsheet__draw--mold"></div>
+                  <div class="docsheet__mold">
+                    <span class="docsheet__mold-top"></span>
+                    <span class="docsheet__mold-cav"></span>
+                    <span class="docsheet__mold-bot"></span>
+                  </div>
                   <div class="docsheet__lines"><span></span><span></span><span></span></div>
                 </div>
                 <span class="docsample__wm">SAMPLE</span>

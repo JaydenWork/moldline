@@ -324,38 +324,69 @@ img { max-width: 100%; display: block; }
   box-shadow:0 2px 8px rgba(14,23,38,.12);
 }
 .docsheet__head { display:flex; align-items:center; gap:7px; }
-.docsheet__mark { width:22px; height:22px; border-radius:5px; background:var(--ink); position:relative; flex:none; }
-.docsheet__mark::after { content:""; position:absolute; inset:5px; border:2px solid var(--accent); border-radius:2px; }
-.docsheet__titlebar { flex:1; height:9px; border-radius:3px; background:linear-gradient(90deg,var(--ink) 56%,#c5cdda 56%); }
+.docsheet__mark { width:22px; height:22px; border-radius:5px; background:var(--dc,var(--ink)); position:relative; flex:none; }
+.docsheet__mark::after { content:""; position:absolute; inset:5px; border:2px solid rgba(255,255,255,.85); border-radius:2px; }
+.docsheet__titlebar { flex:1; height:9px; border-radius:3px; background:linear-gradient(90deg,var(--dc,var(--ink)) 56%,#c5cdda 56%); }
+
+/* 문서별 테마 색 */
+.docsheet--material { --dc:#2f5fa6; }
+.docsheet--coc      { --dc:#18a974; }
+.docsheet--dim      { --dc:#0f8aa6; }
+.docsheet--rel      { --dc:#c79318; }
+.docsheet--mold     { --dc:#d8722a; }
 
 .docsheet__lines { display:flex; flex-direction:column; gap:5px; }
 .docsheet__lines span { height:5px; border-radius:3px; background:#d7dde6; }
 .docsheet__lines span:nth-child(2) { width:82%; }
 .docsheet__lines span:nth-child(3) { width:62%; }
 
-.docsheet__table { display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin-top:1px; }
-.docsheet__table i { height:11px; background:#eef1f6; border:1px solid #e0e5ed; border-radius:2px; }
-.docsheet__table i:nth-child(-n+4) { background:var(--ink); border-color:var(--ink); }
-.docsheet__table--check i:nth-child(4n) { background:rgba(24,169,116,.5); border-color:rgba(24,169,116,.6); }
-.docsheet__table--check i:nth-child(4n):nth-child(-n+4) { background:var(--ink); border-color:var(--ink); }
+/* ① 재질성적서 — 빽빽한 데이터 표 */
+.docsheet__grid { flex:1; display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; grid-auto-rows:1fr; border:1px solid #dbe1ea; border-radius:3px; overflow:hidden; }
+.docsheet__grid i { border-right:1px solid #e6eaf1; border-bottom:1px solid #e6eaf1; background:#fff; }
+.docsheet__grid i:nth-child(4n) { border-right:0; }
+.docsheet__grid i:nth-child(8n+5), .docsheet__grid i:nth-child(8n+6),
+.docsheet__grid i:nth-child(8n+7), .docsheet__grid i:nth-child(8n+8) { background:#f0f3f8; }
+.docsheet__grid i:nth-child(4n+1):not(:nth-child(-n+4)) { background:#e0e7f1; }
+.docsheet__grid i:nth-child(-n+4) { background:var(--dc); border-color:var(--dc); }
 
-.docsheet__chart { flex:1; display:flex; align-items:flex-end; gap:5px; padding-top:6px; border-bottom:1.5px solid #d7dde6; }
+/* ② 검사성적서(COC) — 체크리스트 + 합격 도장 */
+.docsheet__checklist { flex:1; display:flex; flex-direction:column; gap:7px; padding-top:2px; }
+.docsheet__checklist span { position:relative; height:10px; border-radius:3px; background:#eef2f7; }
+.docsheet__checklist span::before { content:""; position:absolute; left:3px; top:50%; transform:translateY(-50%); width:8px; height:8px; border-radius:2px; background:var(--green); }
+.docsheet__seal {
+  position:absolute; left:50%; bottom:12px; transform:translateX(-50%) rotate(-12deg);
+  width:56px; height:56px; border-radius:50%; border:2.5px solid var(--green);
+  color:var(--green); font-family:"Archivo",sans-serif; font-weight:900; font-size:.6rem;
+  line-height:1.05; text-align:center; display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.6); opacity:.9;
+}
+
+/* ③ 치수검사 보고서 — 치수선·화살표 도면 */
+.docsheet__dim { flex:1; position:relative; border:1px solid #e0e5ed; border-radius:4px; margin:2px 0; min-height:60px; }
+.docsheet__dim-shape { position:absolute; left:28%; top:24%; width:44%; height:42%; border:2px solid var(--dc); border-radius:4px; background:rgba(15,138,166,.08); }
+.docsheet__dim-h { position:absolute; left:12%; right:12%; bottom:13%; height:1.5px; background:var(--dc); }
+.docsheet__dim-h::before, .docsheet__dim-h::after { content:""; position:absolute; top:50%; transform:translateY(-50%); border:4px solid transparent; }
+.docsheet__dim-h::before { left:-1px; border-right-color:var(--dc); }
+.docsheet__dim-h::after { right:-1px; border-left-color:var(--dc); }
+.docsheet__dim-v { position:absolute; top:14%; bottom:30%; right:9%; width:1.5px; background:var(--dc); }
+.docsheet__dim-v::before, .docsheet__dim-v::after { content:""; position:absolute; left:50%; transform:translateX(-50%); border:4px solid transparent; }
+.docsheet__dim-v::before { top:-1px; border-bottom-color:var(--dc); }
+.docsheet__dim-v::after { bottom:-1px; border-top-color:var(--dc); }
+
+/* ④ 신뢰성 시험 리포트 — 축이 있는 막대 그래프 + 추세선 */
+.docsheet__chart { flex:1; position:relative; display:flex; align-items:flex-end; gap:4px; padding:8px 3px 0 7px; border-left:1.5px solid #c2cad8; border-bottom:1.5px solid #c2cad8; }
 .docsheet__chart i { flex:1; background:linear-gradient(180deg,var(--accent),var(--accent-deep)); border-radius:2px 2px 0 0; }
-.docsheet__chart i:nth-child(1){ height:38%; } .docsheet__chart i:nth-child(2){ height:62%; }
-.docsheet__chart i:nth-child(3){ height:50%; } .docsheet__chart i:nth-child(4){ height:80%; }
-.docsheet__chart i:nth-child(5){ height:66%; } .docsheet__chart i:nth-child(6){ height:92%; }
+.docsheet__chart i:nth-child(2){ height:34%; } .docsheet__chart i:nth-child(3){ height:55%; }
+.docsheet__chart i:nth-child(4){ height:44%; } .docsheet__chart i:nth-child(5){ height:72%; }
+.docsheet__chart i:nth-child(6){ height:60%; } .docsheet__chart i:nth-child(7){ height:88%; }
+.docsheet__chart i:nth-child(8){ height:78%; }
+.docsheet__trend { position:absolute; left:7px; right:3px; bottom:20%; height:1.5px; background:#d6453b; transform:rotate(-11deg); transform-origin:left; }
 
-.docsheet__draw { flex:1; border:1.5px dashed #c2cad8; border-radius:4px; position:relative; margin:2px 0; min-height:54px; }
-.docsheet__draw::before, .docsheet__draw::after { content:""; position:absolute; background:var(--ink); }
-.docsheet__draw::before { left:16%; right:16%; top:50%; height:2px; transform:translateY(-50%); }
-.docsheet__draw::after { top:18%; bottom:18%; left:50%; width:2px; transform:translateX(-50%); }
-.docsheet__draw--mold { border-style:solid; border-color:#cfd6e2; }
-.docsheet__draw--mold::before { left:24%; right:24%; height:34%; top:33%; background:none; border:2px solid var(--ink); border-radius:3px; transform:none; }
-.docsheet__draw--mold::after { left:50%; top:14%; bottom:14%; width:2px; background:var(--accent-deep); transform:translateX(-50%); }
-
-.docsheet__stamp { position:absolute; right:14px; bottom:14px; width:32px; height:32px; border-radius:50%; border:2px solid #d6453b; transform:rotate(-14deg); opacity:.82; }
-.docsheet__stamp::after { content:""; position:absolute; inset:5px; border-radius:50%; border:1.5px solid #d6453b; }
-.docsheet__stamp--lg { width:42px; height:42px; right:12px; bottom:12px; }
+/* ⑤ 금형 사양서 — 금형 단면도 (상·하판 + 캐비티 + 센터라인) */
+.docsheet__mold { flex:1; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; border:1px dashed #d2d9e4; border-radius:4px; margin:2px 0; min-height:60px; }
+.docsheet__mold::after { content:""; position:absolute; top:8%; bottom:8%; left:50%; width:1px; background:var(--dc); transform:translateX(-50%); opacity:.7; }
+.docsheet__mold-top, .docsheet__mold-bot { width:64%; height:22%; border:1.5px solid var(--dc); background:repeating-linear-gradient(45deg,#f0ddcb,#f0ddcb 2.5px,#fff 2.5px,#fff 5px); }
+.docsheet__mold-cav { width:20px; height:20px; border-radius:50%; border:2px solid var(--dc); background:#fff; z-index:1; }
 
 .docsample__wm {
   position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
