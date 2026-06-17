@@ -404,7 +404,7 @@ img { max-width: 100%; display: block; }
 /* ===== Media card (섹션 내 보조 이미지) ===== */
 .media-card { border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 44px; }
 /* 이미지 영역만 따로 잘라내 패럴럭스(scale·이동)가 아래 캡션을 침범하지 못하게 함 */
-.media-card img { width: 100%; height: 320px; object-fit: cover; display: block; }
+.media-card img { width: 100%; height: 420px; object-fit: cover; display: block; }
 /* 캡션을 이미지 위 레이어로 올림 — transform 걸린 이미지가 캡션 글자를 덮어 가리던 문제 방지 */
 .media-card figcaption { position: relative; z-index: 1; padding: 14px 22px; background: var(--soft); color: var(--slate); font-size: 0.85rem; }
 
@@ -620,7 +620,7 @@ img { max-width: 100%; display: block; }
   .footer__inner { grid-template-columns: 1fr; }
   .floating-cta { display: inline-block; bottom: 80px; }  /* 카카오 플로팅 버튼 위로 스택 */
 
-  .media-card img { height: 200px; }
+  .media-card img { height: 260px; }
   .photo-banner { min-height: 220px; }
 
   .kc-banner__overlay { flex-direction: column; align-items: flex-start; justify-content: center; gap: 16px; padding: 28px 24px; }
@@ -641,7 +641,7 @@ img { max-width: 100%; display: block; }
   .pcase__body { padding: 18px 18px 22px; }
   .step__body { padding: 16px 18px 20px; }
 
-  .media-card img { height: 172px; }
+  .media-card img { height: 224px; }
   .photo-banner { min-height: 190px; }
   .photo-banner__caption h3 { font-size: 1.15rem; }
 
