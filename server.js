@@ -118,8 +118,30 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER) {
   console.warn("⚠️  SMTP 환경변수가 없습니다 — 메일 없이 접수만 저장됩니다. (.env 설정 필요)");
 }
 
-if (process.env.DISCORD_WEBHOOK_URL) console.log("✓ 디스코드 웹훅 알림 활성화");
-else console.warn("⚠️  DISCORD_WEBHOOK_URL 미설정 — 디스코드 알림 비활성화");
+// 진단용: 시작 시 웹훅 URL 유효성을 GET으로 1회 확인 (null=미확인)
+let discordWebhookValid = null;
+if (process.env.DISCORD_WEBHOOK_URL) {
+  console.log("✓ 디스코드 웹훅 알림 활성화");
+  if (typeof fetch !== "function") {
+    discordWebhookValid = false;
+    console.warn("⚠️  이 Node 런타임에 전역 fetch가 없습니다 (Node 18+ 필요) — 디스코드 전송 불가:", process.version);
+  } else {
+    (async function () {
+      try {
+        const r = await fetch(DISCORD_WEBHOOK_URL, { method: "GET" });
+        discordWebhookValid = r.ok;
+        console.log(discordWebhookValid
+          ? "✓ 디스코드 웹훅 URL 검증 통과"
+          : "⚠️  디스코드 웹훅 URL 무효 — status " + r.status + " (대시보드 DISCORD_WEBHOOK_URL 확인 필요)");
+      } catch (e) {
+        discordWebhookValid = false;
+        console.warn("⚠️  디스코드 웹훅 검증 중 오류:", e.message);
+      }
+    })();
+  }
+} else {
+  console.warn("⚠️  DISCORD_WEBHOOK_URL 미설정 — 디스코드 알림 비활성화");
+}
 
 function esc(s) {
   return String(s == null ? "" : s)
@@ -242,15 +264,30 @@ async function notifyDiscord(data, files) {
     payload.allowed_mentions = { parse: ["roles", "users", "everyone"] };
   }
 
-  const form = new FormData();
-  form.append("payload_json", JSON.stringify(payload));
-  attach.forEach(function (f, i) {
-    const buf = fs.readFileSync(f.path);
-    form.append("files[" + i + "]", new Blob([buf]), f.displayName);
-  });
+  if (typeof fetch !== "function") {
+    console.warn("⚠️  디스코드 전송 불가 — 전역 fetch 없음 (Node 18+ 필요):", process.version);
+    return false;
+  }
 
   try {
-    const res = await fetch(DISCORD_WEBHOOK_URL, { method: "POST", body: form });
+    let res;
+    if (!attach.length) {
+      // 첨부 없음 — 단순 JSON 전송 (multipart/FormData/Blob 불필요해 더 견고)
+      res = await fetch(DISCORD_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } else {
+      // 첨부 있음 — multipart로 파일 동봉
+      const form = new FormData();
+      form.append("payload_json", JSON.stringify(payload));
+      attach.forEach(function (f, i) {
+        const buf = fs.readFileSync(f.path);
+        form.append("files[" + i + "]", new Blob([buf]), f.displayName);
+      });
+      res = await fetch(DISCORD_WEBHOOK_URL, { method: "POST", body: form });
+    }
     if (!res.ok) {
       const body = await res.text().catch(function () { return ""; });
       console.warn("⚠️  디스코드 전송 실패:", res.status, body.slice(0, 200));
@@ -458,7 +495,15 @@ app.post("/api/submit", function (req, res) {
 
 /* ---- 헬스체크 ---- */
 app.get("/api/health", function (req, res) {
-  res.json({ ok: true, mail: mailReady, discord: discordReady });
+  res.json({
+    ok: true,
+    node: process.version,
+    hasFetch: typeof fetch === "function",
+    hasFormData: typeof FormData === "function",
+    mail: mailReady,
+    discord: discordReady,
+    discordWebhookValid: discordWebhookValid // true=URL유효, false=무효/fetch없음, null=미확인
+  });
 });
 
 app.listen(PORT, function () {
