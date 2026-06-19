@@ -509,10 +509,10 @@ img { max-width: 100%; display: block; }
 
 /* ===== Floating CTA (mobile) ===== */
 .floating-cta {
-  position: fixed; right: 18px; bottom: 18px; z-index: 90;
+  position: fixed; right: 18px; bottom: 80px; z-index: 90;  /* 80px: 카카오 플로팅 버튼 위로 스택 */
   background: var(--accent); color: var(--accent-ink); font-weight: 700;
   padding: 14px 22px; border-radius: 999px; box-shadow: 0 12px 30px -8px var(--accent-deep);
-  display: none;
+  display: inline-block;  /* 상시 노출 (데스크톱·모바일) */
 }
 
 /* ===== 카카오톡 상담 ===== */
@@ -620,7 +620,6 @@ img { max-width: 100%; display: block; }
   .form { padding: 26px 20px; }
   .form__row { grid-template-columns: 1fr; gap: 0; }
   .footer__inner { grid-template-columns: 1fr; }
-  .floating-cta { display: inline-block; bottom: 80px; }  /* 카카오 플로팅 버튼 위로 스택 */
 
   .media-card img { height: 260px; }
   .photo-banner { min-height: 220px; }
