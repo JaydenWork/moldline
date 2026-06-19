@@ -761,6 +761,14 @@ img { max-width: 100%; display: block; }
   border-radius: 999px; color: #c2492f;
   font-size: 0.82rem; font-weight: 800; word-break: keep-all;
 }
+.cost-bar__cta {
+  display: inline-block; margin-top: 14px; padding: 9px 16px;
+  background: var(--accent); color: var(--accent-ink);
+  border-radius: 999px; font-size: 0.88rem; font-weight: 800;
+  word-break: keep-all; transition: transform 0.2s, background 0.2s;
+  box-shadow: 0 8px 20px -10px var(--accent-deep);
+}
+.cost-bar__cta:hover { transform: translateY(-2px); background: var(--accent-deep); }
 @media (prefers-reduced-motion: reduce) {
   .cost-bar__fill { transition: none; }
 }
