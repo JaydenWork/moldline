@@ -41,6 +41,22 @@ module.exports = {
       error_file: "./logs/bot-error.log",
       merge_logs: true,
       time: true
+    },
+    {
+      // 텔레그램 브레인스토밍 룸 봇 — 두 페르소나 핑퐁(토론만, 코드는 /apply 승인 시에만)
+      // ⚠️ TELEGRAM_BRAINSTORM_BOT_TOKEN(전용 봇) 설정 후 사용. 미설정 시 폴백하나 유지보수 봇과 토큰 충돌 주의.
+      name: "moldline-brainstorm",
+      script: "bot/brainstorm.js",
+      cwd: __dirname,
+      exec_mode: "fork",
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: "300M",
+      out_file: "./logs/brainstorm-out.log",
+      error_file: "./logs/brainstorm-error.log",
+      merge_logs: true,
+      time: true
     }
   ]
 };
