@@ -660,3 +660,47 @@ img { max-width: 100%; display: block; }
   .has-parallax { transform: none !important; }
   .hero__inner, .hero__grid { transform: none !important; opacity: 1 !important; }
 }
+
+/* ===== Compare: 무역상 vs 제품 PM ===== */
+.compare__grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
+  margin-top: 44px; align-items: stretch;
+}
+.compare__col { border-radius: var(--radius-lg); padding: 32px 28px; }
+.compare__col--bad { background: var(--paper); border: 1.5px solid var(--line); }
+.compare__col--good {
+  background: var(--ink); color: #fff; box-shadow: var(--shadow);
+  position: relative; overflow: hidden;
+}
+.compare__col--good::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--accent);
+}
+.compare__label {
+  display: inline-block; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
+  padding: 5px 12px; border-radius: 999px; margin-bottom: 10px;
+}
+.compare__col--bad .compare__label { background: var(--soft); color: var(--slate); }
+.compare__col--good .compare__label { background: var(--accent); color: var(--accent-ink); }
+.compare__name {
+  font-family: "Archivo", "IBM Plex Sans KR", sans-serif;
+  font-size: 1.22rem; font-weight: 800; margin-bottom: 20px; line-height: 1.25;
+}
+.compare__list { list-style: none; display: grid; gap: 14px; }
+.compare__list li {
+  padding-left: 30px; position: relative; font-size: 0.96rem; line-height: 1.55; word-break: keep-all;
+}
+.compare__list li strong { font-weight: 700; }
+.compare__col--bad .compare__list li { color: var(--slate); }
+.compare__col--bad .compare__list li strong { color: var(--ink); }
+.compare__col--bad .compare__list li::before {
+  content: "✕"; position: absolute; left: 2px; top: 0; color: #c2492f; font-weight: 800;
+}
+.compare__col--good .compare__list li { color: rgba(255,255,255,0.9); }
+.compare__col--good .compare__list li strong { color: #fff; }
+.compare__col--good .compare__list li::before {
+  content: "✓"; position: absolute; left: 0; top: 0; color: var(--accent); font-weight: 800;
+}
+@media (max-width: 720px) {
+  .compare__grid { grid-template-columns: 1fr; gap: 16px; margin-top: 32px; }
+  .compare__col { padding: 26px 22px; }
+}
