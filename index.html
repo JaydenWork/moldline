@@ -773,6 +773,63 @@
 
           </div>
         </div>
+
+        <!-- 예시 검품 리포트 (CSS 스타일 HTML 표 — 식별정보는 마스킹) -->
+        <div class="inspreport">
+          <p class="inspreport__lead">출하 전 검품 결과를 아래와 같은 양식으로 정리해 발송합니다. 거래처·단가 등 식별정보는 마스킹했습니다.</p>
+          <div class="inspreport__meta">
+            <span><b>거래처명</b> 〈마스킹〉</span>
+            <span><b>발주단가</b> 〈마스킹〉</span>
+            <span><b>검사일</b> 2025-11-08</span>
+            <span><b>로트수량</b> 2,000 EA</span>
+            <span><b>검사방식</b> AQL 2.5 / 외관 1.0</span>
+          </div>
+          <div class="inspreport__scroll">
+            <table class="insptable">
+              <thead>
+                <tr>
+                  <th scope="col">검사항목</th>
+                  <th scope="col">기준</th>
+                  <th scope="col">측정·결과</th>
+                  <th scope="col">판정</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">치수</th>
+                  <td>도면 ±0.10mm</td>
+                  <td>+0.04 ~ +0.07mm</td>
+                  <td><span class="insptable__pass">합격</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">외관</th>
+                  <td>스크래치·버 無, 색차 ΔE≤1.5</td>
+                  <td>경미 버 2건 → 재가공</td>
+                  <td><span class="insptable__pass">합격</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">기능</th>
+                  <td>버튼 동작·체결력 전수</td>
+                  <td>전수 정상 동작</td>
+                  <td><span class="insptable__pass">합격</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">수량</th>
+                  <td>2,000 EA (발주 대비)</td>
+                  <td>2,000 EA 일치</td>
+                  <td><span class="insptable__pass">합격</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">불량률</th>
+                  <td>AQL 2.5 (한도 14ea)</td>
+                  <td>불량 5ea (0.25%)</td>
+                  <td><span class="insptable__pass">합격</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="inspreport__cap">실제 발송 양식 기준 · 수치는 예시</p>
+        </div>
       </div>
       <p class="cost-note">* 표시된 인증은 검증된 협력 공장의 준수 기준 및 취득 지원 범위이며, 제품·수출 대상국에 따라 필요 인증이 달라질 수 있습니다.</p>
     </div>

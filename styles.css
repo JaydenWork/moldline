@@ -403,6 +403,22 @@ img { max-width: 100%; display: block; }
 .docsample__name { display:block; font-weight:700; font-size:.95rem; color:#fff; }
 .docsample__en { display:block; font-size:.72rem; color:rgba(255,255,255,.5); margin-top:2px; letter-spacing:.02em; }
 
+/* ── 예시 검품 리포트 (HTML 표) ── */
+.inspreport { margin-top:30px; padding-top:26px; border-top:1px solid rgba(255,255,255,.12); }
+.inspreport__lead { font-size:.9rem; color:rgba(255,255,255,.62); text-align:center; margin-bottom:18px; }
+.inspreport__meta { display:flex; flex-wrap:wrap; justify-content:center; gap:8px 18px; margin-bottom:18px; font-size:.82rem; color:rgba(255,255,255,.7); }
+.inspreport__meta b { color:rgba(255,255,255,.9); font-weight:700; margin-right:5px; }
+/* 모바일에서 표가 잘리지 않고 가로 스크롤되도록 */
+.inspreport__scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:12px; }
+.insptable { width:100%; min-width:520px; border-collapse:collapse; background:rgba(255,255,255,.04); font-size:.9rem; }
+.insptable th, .insptable td { padding:11px 14px; text-align:left; border-bottom:1px solid rgba(255,255,255,.1); }
+.insptable thead th { background:rgba(255,255,255,.08); font-size:.82rem; letter-spacing:.02em; color:var(--accent); font-weight:700; }
+.insptable tbody th { font-weight:700; color:#fff; white-space:nowrap; }
+.insptable td { color:rgba(255,255,255,.78); }
+.insptable tbody tr:last-child th, .insptable tbody tr:last-child td { border-bottom:0; }
+.insptable__pass { display:inline-block; font-size:.8rem; font-weight:700; color:#bff0db; background:rgba(24,169,116,.22); border:1px solid rgba(24,169,116,.5); padding:2px 10px; border-radius:999px; }
+.inspreport__cap { text-align:center; font-size:.82rem; color:rgba(255,255,255,.5); margin-top:14px; }
+
 /* ===== Media card (섹션 내 보조 이미지) ===== */
 .media-card { border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 44px; }
 /* 이미지 영역만 따로 잘라내 패럴럭스(scale·이동)가 아래 캡션을 침범하지 못하게 함 */
