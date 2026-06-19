@@ -248,6 +248,8 @@ img { max-width: 100%; display: block; }
 .price-card__list li { padding-left: 26px; position: relative; font-size: 0.95rem; }
 .price-card__list li::before { content: "▸"; position: absolute; left: 4px; color: var(--accent-deep); font-weight: 800; }
 .cost-note { text-align: center; color: var(--slate); font-size: 0.88rem; margin-top: 26px; }
+.cost-cta { text-align: center; margin-top: 32px; display: grid; justify-items: center; gap: 16px; }
+.cost-cta__text { color: var(--ink); font-weight: 700; font-size: 1.05rem; }
 
 /* ===== Certifications ===== */
 .certs { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-top:50px; }
